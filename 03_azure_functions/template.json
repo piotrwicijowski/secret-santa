@@ -2,30 +2,36 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "subscriptionId": {
-            "type": "string"
-        },
         "name": {
-            "type": "string"
-        },
-        "resourceGroup": {
             "type": "string"
         },
         "storageAccountName": {
             "type": "string"
         }
     },
+    "variables": {
+        "subscriptionId": "[subscription().id]",
+        "location": "West Europe",
+        "hostingEnvironment":  "",
+        "hostingPlanName": "[parameters('name')]",
+        "serverFarmResourceGroup": "[resourceGroup().name]",
+        "sku": "Dynamic",
+        "skuCode": "Y1",
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1" 
+    }
     "resources": [
         {
             "apiVersion": "2018-02-01",
             "name": "[parameters('name')]",
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
-            "location": "West Europe",
+            "location": "[variables('location')]",
             "tags": {},
             "dependsOn": [
-                "[concat('microsoft.insights/components/', parameters('name'))]",
-                "[concat('Microsoft.Web/serverfarms/', parameters('name'))]"
+                "microsoft.insights/components/ggcpiotr",
+                "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
             ],
             "properties": {
                 "name": "[parameters('name')]",
@@ -41,50 +47,50 @@
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(concat('microsoft.insights/components/', parameters('name')), '2015-05-01').InstrumentationKey]"
+                            "value": "[reference('microsoft.insights/components/ggcpiotr', '2015-05-01').InstrumentationKey]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('b03494e9-932c-4145-84c1-d9e3fde15234','GGC-piotr','Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
                         },
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('b03494e9-932c-4145-84c1-d9e3fde15234','GGC-piotr','Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[concat(toLower(parameters('name')), 'ac52')]"
+                            "value": "[concat(toLower(parameters('name')), 'aa47')]"
                         }
                     ]
                 },
-                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('resourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('name'))]",
-                "hostingEnvironment": "",
+                "serverFarmId": "[concat('/subscriptions/', variables('subscriptionId'),'/resourcegroups/', variables('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+                "hostingEnvironment": "[variables('hostingEnvironment')]",
                 "clientAffinityEnabled": true
             }
         },
         {
             "apiVersion": "2018-02-01",
-            "name": "[parameters('name')]",
+            "name": "[variables('hostingPlanName')]",
             "type": "Microsoft.Web/serverfarms",
-            "location": "West Europe",
+            "location": "[variables('location')]",
             "kind": "",
             "tags": {},
             "dependsOn": [],
             "properties": {
-                "name": "[parameters('name')]",
-                "workerSize": "0",
-                "workerSizeId": "0",
-                "numberOfWorkers": "1",
-                "hostingEnvironment": ""
+                "name": "[variables('hostingPlanName')]",
+                "workerSize": "[variables('workerSize')]",
+                "workerSizeId": "[variables('workerSizeId')]",
+                "numberOfWorkers": "[variables('numberOfWorkers')]",
+                "hostingEnvironment": "[variables('hostingEnvironment')]"
             },
             "sku": {
-                "Tier": "Dynamic",
-                "Name": "Y1"
+                "Tier": "[variables('sku')]",
+                "Name": "[variables('skuCode')]"
             }
         },
         {
             "apiVersion": "2015-05-01",
-            "name": "[parameters('name')]",
+            "name": "ggcpiotr",
             "type": "microsoft.insights/components",
             "location": "eastus",
             "tags": {},
