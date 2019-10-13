@@ -33,7 +33,7 @@
             "dependsOn": [
                 "[concat('microsoft.insights/components/', variables('insightsName'))]",
                 "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
-                "[concat('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "name": "[parameters('name')]",
