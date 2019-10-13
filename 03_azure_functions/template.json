@@ -10,7 +10,7 @@
         }
     },
     "variables": {
-        "subscriptionId": "[subscription().id]",
+        "subscriptionId": "[subscription().subscriptionId]",
         "location": "West Europe",
         "hostingEnvironment":  "",
         "hostingPlanName": "[parameters('name')]",
