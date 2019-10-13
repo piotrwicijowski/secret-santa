@@ -1,0 +1,1 @@
+[Deploy Azure Functions to Azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpiotrwicijowski%2Fsecret-santa%2Fmaster%2F03_azure_functions%2Ftemplate.json)
