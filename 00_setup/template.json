@@ -1,0 +1,435 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "automationName": {
+            "type": "String"
+        },
+        "automationRunbookName": {
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Automation/automationAccounts",
+            "apiVersion": "2015-10-31",
+            "name": "[parameters('automationName')]",
+            "location": "westeurope",
+            "properties": {
+                "sku": {
+                    "name": "Basic"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/connections",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRunAsConnection')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "connectionType": {
+                    "name": "AzureServicePrincipal"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/connectionTypes",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Azure')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "isGlobal": true,
+                "fieldDefinitions": {
+                    "AutomationCertificateName": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "SubscriptionID": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/connectionTypes",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureClassicCertificate')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "isGlobal": true,
+                "fieldDefinitions": {
+                    "SubscriptionName": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "SubscriptionId": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "CertificateAssetName": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/connectionTypes",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureServicePrincipal')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "isGlobal": true,
+                "fieldDefinitions": {
+                    "ApplicationId": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "TenantId": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "CertificateThumbprint": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    },
+                    "SubscriptionId": {
+                        "isEncrypted": false,
+                        "isOptional": false,
+                        "type": "System.String"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AuditPolicyDsc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Az.Accounts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Az.Automation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Az.Resources')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Azure')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Azure.Storage')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Automation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Compute')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Profile')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Resources')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Sql')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/AzureRM.Storage')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/ComputerManagementDsc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/GPRegistryPolicyParser')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.PowerShell.Core')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.PowerShell.Diagnostics')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.PowerShell.Management')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.PowerShell.Security')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.PowerShell.Utility')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Microsoft.WSMan.Management')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/Orchestrator.AssetManagement.Cmdlets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/PSDscResources')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/SecurityPolicyDsc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/StateConfigCompositeResources')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/xDSCDomainjoin')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/xPowerShellExecutionPolicy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(parameters('automationName'), '/xRemoteDesktopAdmin')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "contentLink": {}
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/runbooks",
+            "apiVersion": "2018-06-30",
+            "name": "[concat(parameters('automationName'), '/', parameters('automationRunbookName'))]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationName'))]"
+            ],
+            "properties": {
+                "runbookType": "PowerShell",
+                "logVerbose": false,
+                "logProgress": false,
+                "logActivityTrace": 0
+            }
+        }
+    ]
+}
