@@ -32,7 +32,7 @@ Get-AzResourceGroup |
         if($groupCreation -ne $null){
             $creatorObjectId = $groupCreation.claims.Content["http://schemas.microsoft.com/identity/claims/objectidentifier"]
             New-AzRoleAssignment -ObjectId $creatorObjectId `
-                -RoleDefinitionName "Contributor" `
+                -RoleDefinitionName "GGC Contributor" `
                 -ResourceGroupName $groupName
             Set-AzResourceGroup -Name $groupName -Tag @{ ggcaccesscontrol="granted"}
         }

@@ -1,0 +1,42 @@
+{
+  "Name": "GGC Contributor",
+  "Id" : null,
+  "IsCustom" : true,
+  "Description": "Lets you manage all resources required for GGC workshops.",
+  "Actions": [
+    "Microsoft.Authorization/*/read",
+    "Microsoft.Insights/alertRules/*",
+    "Microsoft.Insights/components/*",
+    "Microsoft.Insights/metricAlerts/*",
+    "Microsoft.Insights/diagnosticSettings/*",
+    "Microsoft.Insights/logdefinitions/*",
+    "Microsoft.Insights/metricDefinitions/*",
+    "Microsoft.Network/virtualNetworks/subnets/joinViaServiceEndpoint/action",
+    "Microsoft.ResourceHealth/availabilityStatuses/read",
+    "Microsoft.Resources/deployments/*",
+    "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Resources/subscriptions/operationresults/read",
+    "Microsoft.Storage/storageAccounts/*",
+    "Microsoft.Logic/*",
+    "Microsoft.Support/*",
+    "Microsoft.Web/connectionGateways/*",
+    "Microsoft.Web/connections/*",
+    "Microsoft.Web/customApis/*",
+    "Microsoft.Web/serverFarms/*",
+    "Microsoft.Web/certificates/*",
+    "Microsoft.Web/listSitesAssignedToHostName/read",
+    "Microsoft.Web/sites/*"
+  ],
+  "NotActions": [
+    "Microsoft.Authorization/*/Delete",
+    "Microsoft.Authorization/*/Write",
+    "Microsoft.Authorization/elevateAccess/Action",
+    "Microsoft.Blueprint/blueprintAssignments/write",
+    "Microsoft.Blueprint/blueprintAssignments/delete"
+  ],
+  "DataActions": [],
+  "NotDataActions": [],
+  "AssignableScopes": [
+    "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  ]
+}
