@@ -1,0 +1,11 @@
+﻿{
+  "bindings": [
+    {
+      "name": "BoxingDayTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 0 25 12 * *"
+    }
+  ],
+  "disabled": false
+}
