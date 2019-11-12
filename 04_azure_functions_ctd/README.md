@@ -22,3 +22,15 @@ Your Azure Functions instance:
 Your Azure Storage Account:
 
 ![Initial state of Azure Storage](screenshots/storage_initial.png?raw=true "Initial state of Azure Storage")
+
+Once we have that, we can create all of the remaining pieces needed in this module.
+
+In Storage Account Create a container and name it "stocking":
+
+![New blob container creation](screenshots/storage_new_container.png?raw=true "New blob container creation")
+
+In Azure Functions create a new Timer triggered functions. And for now let's set the timer to be the midnight between Christmas Eve and Boxing Day:
+
+![New blob container creation](screenshots/functions_new_timer_01.png?raw=true "New blob container creation")
+![New blob container creation](screenshots/functions_new_timer_02.png?raw=true "New blob container creation")
+![New blob container creation](screenshots/functions_new_timer_03.png?raw=true "New blob container creation")
