@@ -25,7 +25,8 @@
     "Microsoft.Web/serverFarms/*",
     "Microsoft.Web/certificates/*",
     "Microsoft.Web/listSitesAssignedToHostName/read",
-    "Microsoft.Web/sites/*"
+    "Microsoft.Web/sites/*",
+    "Microsoft.CognitiveServices/*"
   ],
   "NotActions": [
     "Microsoft.Authorization/*/Delete",
