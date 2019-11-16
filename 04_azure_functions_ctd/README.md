@@ -34,3 +34,16 @@ In Azure Functions create a new Timer triggered functions. And for now let's set
 ![New blob container creation](screenshots/functions_new_timer_01.png?raw=true "New blob container creation")
 ![New blob container creation](screenshots/functions_new_timer_02.png?raw=true "New blob container creation")
 ![New blob container creation](screenshots/functions_new_timer_03.png?raw=true "New blob container creation")
+
+## "Just make it work"
+
+We will start with the simplest approach, and we will refine it later on. In summary the logic flow of the function would be
+
+    1. Connect to the "common blob container" - let's call it the Xmas tree
+    2. Connect to the "private blob container" - this one we will call the stocking
+    3. List all of the blobs/gifts in it
+    4. Choose a random gift from the list
+    5. Copy it to the stocking
+    6. Remove the gift from the Xmas tree
+
+A rough scaffolding of this approach (but without any actual working code) can be found [here](Secret.Santa.Functions/ChooseRandomGift_0/)
