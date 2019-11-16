@@ -38,7 +38,7 @@ public static Run(TimerInfo myTimer, ILogger log)
     {
         // Download to memory first
         randomGift.DownloadToStream(memoryStream);
-        // Reste the stream to upload from the start
+        // Reset the stream to upload from the start
         memoryStream.Seek(0, SeekOrigin.Begin);
         // Upload the stream
         stockingGift.UploadFromStream(memoryStream);
@@ -46,6 +46,6 @@ public static Run(TimerInfo myTimer, ILogger log)
     }
 
     // Once the copying was finished, delete the gift
-    randomGift.DeleteIfExistsAsync();
+    randomGift.DeleteIfExists();
 }
 
