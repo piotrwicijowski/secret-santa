@@ -147,13 +147,9 @@ The easiest way to copy the contents of one blob to another is by getting it fir
 ```cs
 using(var memoryStream = new MemoryStream())
 {
-    // Download to memory first
     randomGift.DownloadToStream(memoryStream);
-    // Reset the stream to upload from the start
     memoryStream.Seek(0, SeekOrigin.Begin);
-    // Upload the stream
     stockingGift.UploadFromStream(memoryStream);
-    // Set the content type to the original one (presumably "image/jpeg" or similar)
 }
 ```
 
