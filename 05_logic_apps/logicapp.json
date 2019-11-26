@@ -139,7 +139,7 @@
                     "body": {
                         "Body": "@concat('<img src=''data:image/png;base64, ', body('Get_blob_content')?['$content'], '''/>')",
                         "Subject": "#AvanadeSecretSanta Look what I got for christmas:@{outputs('Compose')}  + @{body('Create_SAS_URI_by_path')?['WebUrl']}",
-                        "To": "t.bleszynski@avanade.com"
+                        "To": "your-email@acme.com"
                     },
                     "host": {
                         "connection": {
@@ -161,7 +161,7 @@
                     "body": {
                         "Body": "@concat('<img src=''data:image/png;base64, ', body('Get_blob_content')?['$content'], '''/>')",
                         "Subject": "test",
-                        "To": "t.bleszynski@avanade.com"
+                        "To": "your-email@acme.com"
                     },
                     "host": {
                         "connection": {
