@@ -1,0 +1,224 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Compose": {
+                "inputs": "@body('Describe_Image_Content')?['description']?['captions']?[0]?['text']",
+                "runAfter": {
+                    "Describe_Image_Content": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Compose"
+            },
+            "Create_SAS_URI_by_path": {
+                "inputs": {
+                    "body": {
+                        "Permissions": "Read"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/datasets/default/CreateSharedLinkByPath",
+                    "queries": {
+                        "path": "@triggerBody()?['Path']"
+                    }
+                },
+                "runAfter": {
+                    "Post_a_tweet_2": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Describe_Image_Content": {
+                "inputs": {
+                    "body": "@body('Get_blob_content')",
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['cognitiveservicescomputervision']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/vision/v2.0/describeImageContent"
+                },
+                "runAfter": {
+                    "Get_blob_content": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Get_blob_content": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent(triggerBody()?['Path']))}/content",
+                    "queries": {
+                        "inferContentType": true
+                    }
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            },
+            "Post_a_message_(V3)": {
+                "inputs": {
+                    "body": {
+                        "body": {
+                            "content": "@concat('<a href=''', body('Create_SAS_URI_by_path')?['WebUrl'], '''>click</a>')",
+                            "contentType": "html"
+                        }
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['teams']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v3/beta/teams/@{encodeURIComponent('dceddace-d710-4385-b1c9-c567e392117a')}/channels/@{encodeURIComponent('19:0725069fc4584f89ba37f277f542d57f@thread.skype')}/messages"
+                },
+                "runAfter": {
+                    "Send_email_(V2)": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Post_a_tweet_2": {
+                "inputs": {
+                    "body": "@body('Get_blob_content')",
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['twitter']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/posttweet",
+                    "queries": {
+                        "tweetText": "#AvanadeSecretSanta Look what I got for christmas: @{outputs('Compose')}"
+                    }
+                },
+                "runAfter": {
+                    "Compose": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Post_message": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['slack']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/chat.postMessage",
+                    "queries": {
+                        "as_user": true,
+                        "channel": "CQJFU5SDQ",
+                        "text": "@body('Create_SAS_URI_by_path')?['WebUrl']"
+                    }
+                },
+                "runAfter": {
+                    "Post_a_message_(V3)": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Send_an_email_(V2)": {
+                "inputs": {
+                    "body": {
+                        "Body": "@concat('<img src=''data:image/png;base64, ', body('Get_blob_content')?['$content'], '''/>')",
+                        "Subject": "#AvanadeSecretSanta Look what I got for christmas:@{outputs('Compose')}  + @{body('Create_SAS_URI_by_path')?['WebUrl']}",
+                        "To": "t.bleszynski@avanade.com"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['office365']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v2/Mail"
+                },
+                "runAfter": {
+                    "Create_SAS_URI_by_path": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "Send_email_(V2)": {
+                "inputs": {
+                    "body": {
+                        "Body": "@concat('<img src=''data:image/png;base64, ', body('Get_blob_content')?['$content'], '''/>')",
+                        "Subject": "test",
+                        "To": "t.bleszynski@avanade.com"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['gmail']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v2/Mail"
+                },
+                "runAfter": {
+                    "Send_an_email_(V2)": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "When_a_blob_is_added_or_modified_(properties_only)": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/datasets/default/triggers/batch/onupdatedfile",
+                    "queries": {
+                        "folderId": "JTJmbXktZ2lmdA==",
+                        "maxFileCount": 1
+                    }
+                },
+                "metadata": {
+                    "JTJmbXktZ2lmdA==": "/my-gift"
+                },
+                "recurrence": {
+                    "frequency": "Second",
+                    "interval": 10
+                },
+                "splitOn": "@triggerBody()",
+                "type": "ApiConnection"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+               "create_using": "Azure Portal GUI"
+            }
+        }
+    }
+}
