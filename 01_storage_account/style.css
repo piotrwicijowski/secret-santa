@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 body {
-  background: url('images/bg.jpg') no-repeat center top;
+  background: url('bg.jpg') no-repeat center top;
   background-attachment: fixed;
   background-size: cover;
   font-family: 'Open Sans', sans-serif;
@@ -36,7 +36,7 @@ body {
 }
 .container .inner:after {
     content: '';
-    background: url(images/extra.png) no-repeat 0 0;
+    background: url(extra.png) no-repeat 0 0;
     background-size: cover;
     position: absolute;
     bottom: -110px;
