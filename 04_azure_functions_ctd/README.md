@@ -49,9 +49,7 @@ A rough scaffolding of this approach (but without any actual working code) can b
 
 ### Getting the nugets
 
-If you did this in module 3, then feel free to skip to the next subsection.
-
-Similarly to Module 3, we will be connecting to Azure Storage blob containers. For this we first need to tell the Azure Functions runtime that we will use external nuget libraries, and for this we need to create a `function.proj` file in the function's folder:
+Similarly to Module 3, we will be connecting to Azure Storage blob containers. There, we used a "built in" `#r "Microsoft.WindowsAzure.Storage"` reference, but in this module we want to show a very powerful functionality of Azure Functions - the ability to reference any public nuget package. For this we first need to tell the Azure Functions runtime that we will use external nuget libraries, and for this we need to create a `function.proj` file in the function's folder:
 
 ![Expand the View Files](screenshots/functions_files_01.png?raw=true "Expand the View Files")
 ![Add new file](screenshots/functions_files_02.png?raw=true "Add new file")
@@ -77,40 +75,45 @@ In the end we should have something like this:
 
 ### Connecting to the blob containers
 
-If you did this in module 3, then feel free to skip to the next subsection.
+In previous module we have used a simplified approach to accessing the blobs through output bindings. For this module, we will need a bit more involved logic, as we not only need to get access to single blobs, but to the whole list of blobs in a container
 
-Now we can finally start writing our code. For reference feel free to look at the [library documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.storage.blob?view=azure-dotnet-legacy) and a (.Net quickstart for blob storage)[https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet-legacy]. First of all we will need to create an object that will represent our storage account. We also need to authorize the connection to that storage account and for this we will use a connection string. To get the connection string for your storage account, go to Settings -> Access Keys for that account and click on the "copy" icon to the right of the first connection string:
+Now we can finally start writing our code. For reference feel free to look at the [library documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.storage.blob?view=azure-dotnet-legacy) and a [.Net quickstart for blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet-legacy). First of all we will need to create an object that will represent our storage account. We also need to authorize the connection to that storage account and for this we will use a connection string. To get the connection string for your storage account, go to Settings -> Access Keys for that account and click on the "copy" icon to the right of the first connection string:
 
 ![Storage account connection string](screenshots/storage_connectionstring.png?raw=true "Storage account connection string")
 
-Since you don't have direct access to the Xmas tree storage account, you have no way of obtaining the connection string to it, but don't worry, it will be provided to you during the workshops.
+Since you don't have direct access to the Xmas tree storage account, you have no way of obtaining any access, but don't worry, everything required will be provided to you during the workshops.
 
-Now that we have both connection strings, we can create the objects that represent our storage accounts:
+For Xmas tree we will use something called the SAS token (SAS stands for [Shared Access Signature](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview)) - it is a way of sharing a limited access to parts of your storage. For the purpose of this workshops you will need access only to one container (not the whole storage account), and within that container, only listing, reading and deleting blobs is allowed. Accessing resources through SAS is through a Uri to the resource - for us it will be something like `https://thenameofthestorageaccount.blob.core.windows.net/xmastree`, and the SAS token in the following form: `?sp=rwdl&st=2019-12-11T14:50:59Z&se=2019-12-20T14:50:59Z&sv=2019-02-02&sr=c&sig=Zk5sDiwMz2X9vw3Mi4TGvWBCGu6thCyb%3D`, both will be provided to you.
+
+Now that we have our stocking connection string, we can create the object that represent our storage account:
 
 ```cs
-var xmasTreeStorageAccount = CloudStorageAccount.Parse(xmasTreeStorageConnectionString);
 var stockingStorageAccount = CloudStorageAccount.Parse(stockingStorageConnectionString);
 ```
 
-Once we have that, we can specify that we will be dealing with blobs specifically (since Azure Storage has option to deal with files, tables and queues as well, this distinction is required). For this we
+Once we have that, we can specify that we will be dealing with blobs specifically (since Azure Storage has option to deal with files, tables and queues as well, this distinction is required). For this we use
 
 ```cs
-var xmasTreeCloudBlobClient = xmasTreeStorageAccount.CreateCloudBlobClient();
 var stockingCloudBlobClient = stockingStorageAccount.CreateCloudBlobClient();
 ```
 
-And finally, since the Storage Account can (and most often will) contain several containers, we need to specify, which of them we will be dealing with. We specify them by name. For the Xmas tree the name is `"xmastree"` and for the stocking it is `"stocking"`:
+And finally, since the Storage Account can (and most often will) contain several containers, we need to specify, which of them we will be dealing with. We specify them by name:
 
 ```cs
-var xmasTreeCloudBlobContainer = xmasTreeCloudBlobClient.GetContainerReference("xmastree");
 var stockingCloudBlobContainer = stockingCloudBlobClient.GetContainerReference("stocking");
+```
+
+For the Xmas tree we were given access only to the container, so we can create it directly (without going through the CloudStorageAccount and CloudBlobClient objects, as we can't really access that). To create a `CloudBlobContainer` object, we just pass the `Uri` including the SAS token, like shown below:
+
+```cs
+var xmasTreeCloudBlobContainer = new CloudBlobContainer(new Uri(xmasTreeContainerUrl + xmasTreeSASToken), null);
 ```
 
 ### Listing blobs in container
 
 In order to "randomly choose" a gift, we first need to know what is available - we need to get the whole list of blobs in the xmastree container. Let's check the (documentation)[https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.storage.blob.cloudblobcontainer?view=azure-dotnet-legacy] if there is anything that we could use. Sure enough there are a couple of methods that have a "List" in their name.
 
-Quick note - in "production" scenarios, the number of blobs stored in containers can be absolutely huge. All requests between cloud services and storage accounts go through the networks and this adds latency. That is why blob listing is by default paged and each page has at most 5000 elements. So in order to list all blobs, several requests would need to be made, and since all of them can take some time, it is best to use async. That is why methods like `ListBlobsSegmentedAsync` should generally be used. Fortunately for us, we won't be dealing with such huge amounts of data during these workshops, so we can just use the simple `ListBlobs` method.
+Quick note - we will be using the simplest method `ListBlobs`, but in production scenarios, the number of blobs stored in containers can be absolutely huge. All requests between cloud services and storage accounts go through the networks and this adds latency. That is why blob listing is by default paged and each page has at most 5000 elements. So in order to list all blobs, several requests would need to be made, and since all of them can take some time, it is best to use async. That is why methods like `ListBlobsSegmentedAsync` should generally be used. Fortunately for us, we won't be dealing with such huge amounts of data during these workshops, so we can just write:
 
 ```cs
 var giftList = xmasTreeCloudBlobContainer.ListBlobs();
@@ -124,7 +127,7 @@ var giftList = xmasTreeCloudBlobContainer.ListBlobs().Select(x => x as CloudBloc
 
 ### Getting a random element
 
-Fortunately for us, .NET framework contains a powerful set of classes for dealing practically with anything we can think of, including "randomness". In addition, we can easily get a random integer in range `[0..n-1]`, which can then serve as an index for accessing alements in the gift list (make sure to turn it into a list first). What we get is similar to this:
+Fortunately for us, .NET framework contains a powerful set of classes for dealing practically with anything we can think of, including "randomness". In addition, we can easily get a random integer in range `[0..n-1]`, which can then serve as an index for accessing elements in the gift list (make sure to turn it into a list first). What we get is similar to this:
 
 ```cs
 var rnd = new Random();
@@ -136,7 +139,7 @@ Quick note - it is generally inadvisable to create a new instance of `Random` ev
 
 ### Copy one blob to another
 
-Just as before in Module 3, we will be uploading data to a blob. For this we need a blob reference:
+Just as before in Module 3, we will be uploading data to a blob, but now we don't get the blob object through the binding, but rather we need to create a reference to it ourselves. Since we already have our container, that will hold that blob, we can just write the following:
 
 ```cs
 var stockingGift = stockingCloudBlobContainer.GetBlockBlobReference(randomGift.Name);
@@ -155,7 +158,7 @@ using(var memoryStream = new MemoryStream())
 
 ### Move == Copy + Delete
 
-Since we want to move the file, we need to delete the original gift:
+We want to move the file, and so we need to delete the original gift after the upload was complete:
 
 ```cs
 randomGift.DeleteIfExists();
@@ -163,4 +166,7 @@ randomGift.DeleteIfExists();
 
 ### Run/compile/test
 
-That pretty much should do it. Feel free to sprinkle the `log.LogInformation()` around your code to have a better understanding what`s what. In this stage you should get something like [this](Secret.Santa.Functions/ChooseRandomGift_1/)
+That pretty much should do it. Feel free to sprinkle the `log.LogInformation()` around your code to have a better understanding what`s what. In this stage you should get something like [the code shown in this directory](Secret.Santa.Functions/ChooseRandomGift_1/). Note - The ChooseRandomGift_1 directory contains a fully working code, but don't just copy it over, unless you are absolutely stuck.
+
+## More async!
+
