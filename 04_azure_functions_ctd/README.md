@@ -45,7 +45,7 @@ We will start with the simplest approach, and we will refine it later on. In sum
 4. Choose a random gift from the list
 5. "Move" it to the stocking
 
-A rough scaffolding of this approach (but without any actual working code) can be found [here](Secret.Santa.Functions/ChooseRandomGift_0/)
+A rough scaffolding of this approach (but without any actual working code) can be found [here](Secret.Santa.Functions/ChooseRandomGift_0/). Feel free to copy it over to your function app and modify/fill out all the missing parts.
 
 ### Getting the nugets
 
@@ -170,3 +170,153 @@ That pretty much should do it. Feel free to sprinkle the `log.LogInformation()` 
 
 ## More async!
 
+Even though the code may seem to run quickly, we are using quite a few blocking operations, mostly the ones connected to accessing the blobs, as they are network requests. We can easily fix that, because most of the methods have `async` equivalents. But first of all, we need to specify that the function will be running asynchronously, so we need to change the signature to:
+
+```cs
+public async static Task Run(TimerInfo myTimer, ILogger log)
+```
+
+Async functions have `async` keyword in front, and must return either a `Task` (for `void` returning equivalents) or `Task<T>` (for methods returning objects of type `T`). And now we can replace the methods into their asynchronous equivalents (remember to use the `await` keyword):
+
+Downloading blob:
+```cs
+await randomGift.DownloadToStreamAsync(memoryStream);
+```
+
+Uploading blob:
+```cs
+await stockingGift.UploadFromStreamAsync(memoryStream);
+```
+
+Deleting blob:
+```cs
+await randomGift.DeleteIfExistsAsync();
+```
+
+Note - `ListBlobs` does not have a direct async equivalent, which is a shame.
+
+After changing the code to be more asynchronous you should get something like [the code shown in this directory](Secret.Santa.Functions/ChooseRandomGift_1/).
+
+## "But I wanted this gift!"
+
+For now everything worked fine, as each of you were doing the tests independently. But imagine what would happen if all of you were to rush to the xmas tree - there would be conflicts - it is almost impossible that everyone would randomly choose a different gift than all others, some gifts would be chosen by several people. Let's all set the trigger time to the exact same minute and second (let's say the next minute divisible by 5). For that open the "Integrate" section of your Azure Function:
+
+![Changing the schedule of an Azure Function](screenshots/functions_schedule.png?raw=true "Changing the schedule of an Azure Function")
+
+Let's now see, how it all turns out. Choosing randomly is not deterministic, so some of you might receive errors, some not, some of you may get the same gifts as others, some gifts will not be taken at all, there might be conflicts during deleting the blobs from xmastree. Let's fix that.
+
+## Leasing
+
+Fortunately for us, blobs in Azure Storage have just the right feature that will solve this problem - [blob leasing](https://docs.microsoft.com/en-us/rest/api/storageservices/lease-blob). Leasing is a mechanism that allows us to claim a blob just for us for some time - up to 60 seconds (it is possible to do an infinite lease, but we don't recommend it, because if the code crashes before we released the lease, it is complicated to "reset" the state of the blob so that is is accessible once again), and during that time, only the code that acquired the lease can do operations with the blob.
+
+### First try
+
+The first approach is to just try leasing the gift that we have randomly selected, with a `AcquireLease` method:
+
+```cs
+var randomGift = giftList[randomIndex];
+string leaseID = null;
+TimeSpan leaseTime = TimeSpan.FromSeconds(60);
+leaseID = randomGift.AcquireLease(leaseTime, null);
+```
+
+Calling the `AcquireLease` throws an exception in case the blob was already leased. So now, if we use that code, there will be no conflicts, as once the gift is leased, it will be accessed only by one function, all others will crash. Try this out (set the same trigger time, like before).
+
+### Improvement - if someone leased, choose another
+
+This solution might "work" in a sense that we don't get duplicates, but the functions would need to be re-run for all of the unlucky cases, which is not ideal. Instead of crashing, we can keep trying to select another random gift, and see if that was successful. To avoid crashing the function on an unsuccessful, we wrap the `AcquireLease` in a `try catch` block:
+
+
+```cs
+CloudBlockBlob leasedGift = null;
+string leaseID = null;
+TimeSpan leaseTime = TimeSpan.FromSeconds(60);
+
+var possibleGift = ...?;
+try
+{
+    leaseID = possibleGift.AcquireLease(leaseTime, null);
+    log.LogInformation($"Leasing successful {possibleGift.Name}");
+    leasedGift = possibleGift;
+}
+catch(Exception)
+{
+    log.LogInformation($"The gift {possibleGift.Name} was already leased");
+}
+```
+
+We don't really know how many times we will need to "try another random gift", but in the worst case scenario we will need to go through the whole list. And, in addition, it is pointless to try checking the same gift several times, we assume that if someone leased a blob, it will not be available to us any more.
+
+With that in mind the best approach is to first randomize the whole list, and then iterate over all elements and the first one that is available will be ours to take.
+
+To randomize a list we can sort it by a random number, like so:
+```cs
+var randomizedGifts = giftList.OrderBy(g => rnd.Next()).ToList();
+```
+
+Then, we loop through the whole randomized list:
+```cs
+foreach(var possibleGift in randomizedGifts)
+{
+    //our gift leasing logic here
+}
+```
+
+And inside, we `try` to lease each gift one by one, and once we are successful, we can `break` out of the loop - we just need one gift.
+
+```cs
+CloudBlockBlob leasedGift = null;
+string leaseID = null;
+TimeSpan leaseTime = TimeSpan.FromSeconds(60);
+foreach(var possibleGift in randomizedGifts)
+{
+    try
+    {
+        leaseID = possibleGift.AcquireLease(leaseTime, null);
+        log.LogInformation($"Leasing successful {possibleGift.Name}")
+        leasedGift = possibleGift;
+        break;
+    }
+    catch(Exception)
+    {
+        log.LogInformation($"The gift {possibleGift.Name} was already leased, trying next");
+    }
+}
+```
+
+And if we are very very very unlucky (e.g. when more people want to take gifts from under the tree than was there in the first place) we need to check if in the end, we managed to lease any gift:
+
+```cs
+if(leasedGift == null){
+    log.LogError($"All gifts were already leased, exiting");
+    return;
+}
+```
+
+### I have a lease, now what
+
+Having the lease on a blob also means a bit of additional work - for example we can no longer "just delete" the blob like we did before, we need to say "I want to delete this blob, I know that it was leased by me, and here is the proof that I leased it and that I'm allowed to do anything with it".
+
+TODO
+```cs
+var randomGift = giftList[randomIndex];
+try
+{
+    // Try to acquire lease - if someone was faster, this method throws an exception
+    log.LogInformation($"Trying to lease {possibleGift.Name}");
+    leaseID = possibleGift.AcquireLease(leaseTime, null);
+
+    // If acquiring a lease was successful, do the following
+    log.LogInformation($"Leasing successful {possibleGift.Name}");
+    // AccessCondition is needed for operating on a leased blob
+    acc = new AccessCondition();
+    acc.LeaseId = leaseID;
+    // The current gift was leased, don't check any more possible gifts
+    leasedGift = possibleGift;
+    break;
+}
+catch(Exception)
+{
+    log.LogInformation($"The gift {possibleGift.Name} was already leased, trying next");
+}
+```
