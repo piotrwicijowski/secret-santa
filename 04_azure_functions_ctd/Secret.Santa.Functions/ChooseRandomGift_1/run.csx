@@ -8,7 +8,7 @@ static Random rnd = new Random();
 const string xmasTreeStorageConnectionString = "you'll get that during the course";
 
 // The stocking is your personal storage for your gift
-static const string stockingStorageConnectionString = "you'll paste your own connection string here";
+const string stockingStorageConnectionString = "you'll paste your own connection string here";
 
 public static Run(TimerInfo myTimer, ILogger log)
 {
