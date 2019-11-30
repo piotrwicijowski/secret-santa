@@ -5,25 +5,23 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 
 static Random rnd = new Random();
-// Connection strings to the azure storage
-// The xmasTree is the "common storage" of gifs
-const string xmasTreeStorageConnectionString = "you'll get that during the course";
-
+// SAS Uri for the xmastree container
+// The xmastree is the "common storage" of gifts
+const string xmasTreeContainerUrl = "you'll get that during the course";
+const string xmasTreeSASToken = "you'll get that during the course";
 // The stocking is your personal storage for your gift
 const string stockingStorageConnectionString = "you'll paste your own connection string here";
 
 public async static Task Run(TimerInfo myTimer, ILogger log)
 {
     log.LogInformation("Setting up storage accounts, blob clients and containers");
-    // Setup connection to both blob storages
-    // Storage accounts for both storages
-    var xmasTreeStorageAccount = CloudStorageAccount.Parse(xmasTreeStorageConnectionString);
+    // Setup connection to both blob storage
+    // Storage accounts for your storage
     var stockingStorageAccount = CloudStorageAccount.Parse(stockingStorageConnectionString);
-    // CloudBlobClient instances for working with blobs
-    var xmasTreeCloudBlobClient = xmasTreeStorageAccount.CreateCloudBlobClient();
+    // CloudBlobClient instance for working with blobs
     var stockingCloudBlobClient = stockingStorageAccount.CreateCloudBlobClient();
-    // Reference xmastree and stocking containers in appropriate storages
-    var xmasTreeCloudBlobContainer = xmasTreeCloudBlobClient.GetContainerReference("xmastree");
+    // Reference xmastree and stocking containers
+    var xmasTreeCloudBlobContainer = new CloudBlobContainer(new Uri(xmasTreeContainerUrl + xmasTreeSASToken), null);
     var stockingCloudBlobContainer = stockingCloudBlobClient.GetContainerReference("stocking");
 
     // List the blobs in the container.
@@ -87,7 +85,7 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
     {
         // Download to memory first
         await leasedGift.DownloadToStreamAsync(memoryStream);
-        // Reste the stream to upload from the start
+        // Reset the stream to upload from the start
         memoryStream.Seek(0, SeekOrigin.Begin);
         // Upload the stream
         await stockingGift.UploadFromStreamAsync(memoryStream);
