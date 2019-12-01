@@ -36,7 +36,7 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
     log.LogInformation($"All available gifts in xmastree container:\n{string.Join("\n",giftList.Select(x => x.Name))}");
     // Randomize the order in which we will try picking up the presents
     var randomizedGifts = giftList.OrderBy(g => rnd.Next()).ToList();
-    log.LogInformation($"Randomized gifts:\n{string.Join("\n",giftList.Select(x => x.Name))}");
+    log.LogInformation($"Randomized gifts:\n{string.Join("\n",randomizedGifts.Select(x => x.Name))}");
 
     // Blob leasing - making sure only one client at a time can access a specific blob
     // Variable that will eventually hold a gift that we managed to get a lease on
@@ -86,6 +86,12 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
     // Copy the leased gift to our stocking
     log.LogInformation($"Copying the leased gift {leasedGift.Name} to our container");
     await stockingGift.StartCopyAsync(new Uri(leasedGiftUrl));
+
+    while (stockingGift.CopyState.Status == CopyStatus.Pending)
+    {
+        await Task.Delay(200);
+        await stockingGift.FetchAttributesAsync();
+    }
 
     // Once the copying was finished, delete the leased gift
     // Since the blob was leased, in order to remove it, we need to specify

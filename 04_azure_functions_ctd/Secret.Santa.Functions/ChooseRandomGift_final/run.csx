@@ -36,7 +36,7 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
     log.LogInformation($"All available gifts in xmastree container:\n{string.Join("\n",giftList.Select(x => x.Name))}");
     // Randomize the order in which we will try picking up the presents
     var randomizedGifts = giftList.OrderBy(g => rnd.Next()).ToList();
-    log.LogInformation($"Randomized gifts:\n{string.Join("\n",giftList.Select(x => x.Name))}");
+    log.LogInformation($"Randomized gifts:\n{string.Join("\n",randomizedGifts.Select(x => x.Name))}");
 
     // Blob leasing - making sure only one client at a time can access a specific blob
     // Variable that will eventually hold a gift that we managed to get a lease on
@@ -46,8 +46,7 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
     // Maximum finite time for lease is 60 seconds
     TimeSpan leaseTime = TimeSpan.FromSeconds(60);
     // For continuous renewing a lease in a background Task we need a way to cancel the renewal
-    CancellationTokenSource tokenSource = new CancellationTokenSource();
-    CancellationToken token = tokenSource.Token;
+
 
     // Check each gift one by one and try to lease it - if someone was faster, move to another one
     foreach(var possibleGift in randomizedGifts)
@@ -63,29 +62,6 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
             // AccessCondition is needed for operating on a leased blob
             acc = new AccessCondition();
             acc.LeaseId = leaseID;
-            // Define a background task that will renew the lease periodically (in case the download takes more than 60s)
-            Task.Run(() =>
-            {
-                try
-                {
-                    // Do not try renewing the lease infinitely, 10 times should be sufficient
-                    for (int i = 0; i < 10; i++)
-                    {
-                        // Renew the lease every 50 seconds
-                        log.LogInformation("Waiting 50s for lease renewal");
-                        Thread.Sleep(TimeSpan.FromSeconds(50));
-                        // Check if renewing was cancelled - if so, throw an Exception
-                        token.ThrowIfCancellationRequested();
-                        // Renew the lease
-                        log.LogInformation("Renewing lease");
-                        possibleGift.RenewLease(acc);
-                    }
-                }
-                catch(OperationCanceledException)
-                {
-                    log.LogInformation("Lease renewal canceled");
-                }
-            }, token);
             // The current gift was leased, don't check any more possible gifts
             leasedGift = possibleGift;
             break;
@@ -100,26 +76,66 @@ public async static Task Run(TimerInfo myTimer, ILogger log)
         log.LogError($"All gifts were already leased, exiting");
         return;
     }
-    log.LogInformation($"My random gift is {leasedGift.Name}");
 
-    // Copying blobs between two storage accounts (without downloading it to memory first) 
-    // Require the use of SAS token, which we already have
-    log.LogInformation("Combinding the leased gift Url with SAS token for access");
-    var leasedGiftUrl = leasedGift.Uri.AbsoluteUri + xmasTreeSASToken;
+    CancellationTokenSource tokenSource = new CancellationTokenSource();
+    CancellationToken token = tokenSource.Token;
+    try
+    {
+        // Define a background task that will renew the lease periodically (in case the download takes more than 60s)
+        Task.Run(() =>
+        {
+            try
+            {
+                // Do not try renewing the lease infinitely, 10 times should be sufficient
+                for (int i = 0; i < 10; i++)
+                {
+                    // Renew the lease every 50 seconds
+                    log.LogInformation("Waiting 50s for lease renewal");
+                    Thread.Sleep(TimeSpan.FromSeconds(50));
+                    // Check if renewing was cancelled - if so, throw an Exception
+                    token.ThrowIfCancellationRequested();
+                    // Renew the lease
+                    log.LogInformation("Renewing lease");
+                    leasedGift.RenewLease(acc);
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                log.LogInformation("Lease renewal canceled");
+            }
+        }, token);
 
-    // The blob for gift in our stocking container
-    var stockingGift = stockingCloudBlobContainer.GetBlockBlobReference(leasedGift.Name);
-    // Copy the leased gift to our stocking
-    log.LogInformation($"Copying the leased gift {leasedGift.Name} to our container");
-    await stockingGift.StartCopyAsync(new Uri(leasedGiftUrl));
+        log.LogInformation($"My random gift is {leasedGift.Name}");
 
-    // Once the copying was finished, delete the leased gift
-    // Since the blob was leased, in order to remove it, we need to specify
-    // the lease (variable acc)
-    log.LogInformation($"Deleting the leased gift {leasedGift.Name} from xmastree container");
-    await leasedGift.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, acc, null, null);
-    // We no longer need to have the token renewed in background Task
-    tokenSource.Cancel();
-    log.LogInformation("Finished");
+        // Copying blobs between two storage accounts (without downloading it to memory first) 
+        // Require the use of SAS token, which we already have
+        log.LogInformation("Combinding the leased gift Url with SAS token for access");
+        var leasedGiftUrl = leasedGift.Uri.AbsoluteUri + xmasTreeSASToken;
+
+        // The blob for gift in our stocking container
+        var stockingGift = stockingCloudBlobContainer.GetBlockBlobReference(leasedGift.Name);
+        // Copy the leased gift to our stocking
+        log.LogInformation($"Copying the leased gift {leasedGift.Name} to our container");
+        await stockingGift.StartCopyAsync(new Uri(leasedGiftUrl));
+
+        while (stockingGift.CopyState.Status == CopyStatus.Pending)
+        {
+            await Task.Delay(200);
+            await stockingGift.FetchAttributesAsync();
+        }
+
+        // Once the copying was finished, delete the leased gift
+        // Since the blob was leased, in order to remove it, we need to specify
+        // the lease (variable acc)
+        log.LogInformation($"Deleting the leased gift {leasedGift.Name} from xmastree container");
+        await leasedGift.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, acc, null, null);
+        // We no longer need to have the token renewed in background Task
+
+    }
+    finally
+    {
+        tokenSource.Cancel();
+        log.LogInformation("Finished");
+    }
 }
 
