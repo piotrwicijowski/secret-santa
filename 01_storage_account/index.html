@@ -9,7 +9,6 @@
     <title>Cloud-First Secret Santa</title>
     <link href="style.css" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -72,41 +71,35 @@
         </div>
     </div>
     <script>
-        $("#foo").submit(function (event) {
-            var ajaxRequest;
-
+        var form = document.getElementById('foo');
+        form.addEventListener('submit', function (event) {
             /* Stop form from submitting normally */
             event.preventDefault();
 
+            var resultDiv = document.getElementById('result');
             /* Clear result div*/
-            $("#result").html('');
+            resultDiv.innerText = '';
 
             /* Send the data using post and put the results in a div. */
-            /* I am not aborting the previous request, because it's an
-               asynchronous request, meaning once it's sent it's out
-               there. But in case you want to abort it you can do it
-               by abort(). jQuery Ajax methods return an XMLHttpRequest
-               object, so you can just use abort(). */
-            ajaxRequest = $.ajax({
-                url: "url to azure function",
-                type: "post",
-                data: JSON.stringify({"name" : $('#name').val()})
-            });
-
-            /*  Request can be aborted by ajaxRequest.abort() */
-
-            ajaxRequest.done(function (response, textStatus, jqXHR) {
-
+            fetch("url to azure function",
+            {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify({"name" : document.getElementById('name').value})
+            })
+            .then(function(res){
                 // Show successfully for submit message
-                $("#result").html('Submitted successfully');
-            });
-
+                resultDiv.innerText = 'Submitted successfully';
+            })
             /* On failure of request this function will be called  */
-            ajaxRequest.fail(function () {
-
+            .catch(function(res){
                 // Show error
-                $("#result").html('There is error while submit');
-            });
+                resultDiv.innerText = 'There is error while submit';
+            })
+
         });
     </script>
 </body>
