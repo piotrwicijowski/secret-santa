@@ -57,10 +57,10 @@
                     <h1><span class="top">Wyślij extra</span><span class="middle">prezent</span><span class="bottom">na
                             Święta 2019.</span></h1>
                 </div>
-                <form id="foo">
+                <form id="postData">
                     <div class="input">
                         <input id="name" type="text" name="name" required />
-                        <label for="name">Jak nazwiesz swój prezent?</label>
+                        <label for="name">Jaki prezent chcesz wręczyć?</label>
                         <div id="result" class="message"></div>
                     </div>
                     <div class="button">
@@ -71,7 +71,7 @@
         </div>
     </div>
     <script>
-        var form = document.getElementById('foo');
+        var form = document.getElementById('postData');
         form.addEventListener('submit', function (event) {
             /* Stop form from submitting normally */
             event.preventDefault();
