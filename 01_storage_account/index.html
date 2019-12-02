@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Avanade">
+    <title>Cloud-First Secret Santa</title>
+    <link href="style.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="snowflakes" aria-hidden="true">
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+        <div class="snowflake">
+            ❅
+        </div>
+        <div class="snowflake">
+            ❆
+        </div>
+    </div>
+    <div class="container">
+        <div class="wrapper">
+            <div class="inner">
+                <div class="title">
+                    <h1><span class="top">Wyślij extra</span><span class="middle">prezent</span><span class="bottom">na
+                            Święta 2019.</span></h1>
+                </div>
+                <form id="foo">
+                    <div class="input">
+                        <input id="name" type="text" name="name" required />
+                        <label for="name">Jak nazwiesz swój prezent?</label>
+                        <div id="result" class="message"></div>
+                    </div>
+                    <div class="button">
+                        <button id="submit" type="submit">Wyślij</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var form = document.getElementById('foo');
+        form.addEventListener('submit', function (event) {
+            /* Stop form from submitting normally */
+            event.preventDefault();
+
+            var resultDiv = document.getElementById('result');
+            /* Clear result div*/
+            resultDiv.innerText = '';
+
+            /* Send the data using post and put the results in a div. */
+            fetch("url to azure function",
+            {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify({"name" : document.getElementById('name').value})
+            })
+            .then(function(res){
+                // Show successfully for submit message
+                resultDiv.innerText = 'Submitted successfully';
+            })
+            /* On failure of request this function will be called  */
+            .catch(function(res){
+                // Show error
+                resultDiv.innerText = 'There is error while submit';
+            })
+
+        });
+    </script>
+</body>
+
+</html>

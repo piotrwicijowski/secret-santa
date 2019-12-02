@@ -195,7 +195,7 @@ await randomGift.DeleteIfExistsAsync();
 
 Note - `ListBlobs` does not have a direct async equivalent, which is a shame.
 
-After changing the code to be more asynchronous you should get something like [the code shown in this directory](Secret.Santa.Functions/ChooseRandomGift_1/).
+After changing the code to be more asynchronous you should get something like [the code shown in this directory](Secret.Santa.Functions/ChooseRandomGift_2/).
 
 ## "But I wanted this gift!"
 
@@ -296,27 +296,91 @@ if(leasedGift == null){
 ### I have a lease, now what
 
 Having the lease on a blob also means a bit of additional work - for example we can no longer "just delete" the blob like we did before, we need to say "I want to delete this blob, I know that it was leased by me, and here is the proof that I leased it and that I'm allowed to do anything with it".
+The `DeleteIfExistsAsync` method has an overload that allows us to do it. The lease information needs to be wrapped into an `AccessCondition` object first and passed as one of the arguments of the delete method. This method overload takes some other arguments that we need to provide as well, but they are not important for us, so we will just provide the default values. So in the end we will have the following pieces of code:
 
-TODO
 ```cs
-var randomGift = giftList[randomIndex];
+AccessCondition acc = null;
+///...
+acc = new AccessCondition();
+acc.LeaseId = leaseID;
+//...
+await leasedGift.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, acc, null, null);
+```
+
+After changing the code to use leasing and choosing the gift one by one iterating over a randomized list we should get something like [the code shown in this directory](Secret.Santa.Functions/ChooseRandomGift_3/).
+
+## Copy blobs directly (bonus)
+
+You may have noticed, that for copying the blob from one container to another we are using `MemoryStream`. What this means is that our Azure Functions instance needs to download and upload the whole contents of the blob. This is not a problem for our use-case, as our files would not exceed a couple of megabytes. However, if the file sizes or the amounts of processed files would get bigger, this approach would be inefficient and costly.
+
+The easiest and most straightforward way would be to use the following:
+
+```cs
+await destBlob.StartCopyAsync(sourceBlob);
+```
+
+Unfortunately, this works only if we are copying blobs within the same storage account - in that situation no network data transfer would happen, the blob storage would just update references internally. Since our use-case involves copying blobs _between_ storage accounts, we need to use a bit different approach. One of the overloads of the copy method takes a `Uri` object - which we can create by using the `AbsoluteUri` of the leased gift combined with the SAS token of the xmastree container. This way we get the following:
+
+```cs
+var leasedGiftUrl = leasedGift.Uri.AbsoluteUri + xmasTreeSASToken;
+await stockingGift.StartCopyAsync(new Uri(leasedGiftUrl));
+```
+
+This copy operation is run in the background, so our method may finish even before the copying was complete. If we want to continue once the blob was copied, we need to keep checking the status of the copy operation, like so:
+
+```cs
+while (stockingGift.CopyState.Status == CopyStatus.Pending)
+{
+    await Task.Delay(200);
+    await stockingGift.FetchAttributesAsync();
+}
+```
+
+A version of the code with direct copying can be found[here](Secret.Santa.Functions/ChooseRandomGift_4/).
+
+## Extend the lease (bonus)
+
+When acquiring the lease we have silently assumed that 60 seconds is going to be enough. And for our purposes this is true, as we are dealing with small files and we are just copying them. But what if we needed to do a bit more and hold the lease longer, and release it after some period that we can't specify or plan upfront.
+
+For that we can use the `RenewLease` method of the blob. But this needs to run in the _background_ so that our regular logic flow does not have to be aware of the renewal. For running tasks in another thread we can use the `Task.Run` method, for which we provide the logic that needs to be executed. Inside we will wait some time just before the original lease expiration (in this example we'll wait 50 seconds), and then renew the lease, and loop.
+
+One thing that you may immediately notice, is that the outside of the parallel code needs a way to "stop" the task from running - when we are done with the blob we no longer need to renew the lease. For that we can use `CancellationTokenSource` objects - we pass tokens created from it to the `Task.Run` method as one of the parameters, and once we are done, we call the `tokenSource.Cancel`. And once that happens, inside the Task we can check the status of the token by calling `token.ThrowIfCancellationRequested` method.
+
+Finally, to avoid renewing the lease infinitely in case we forgot to cancel the token or if the logic crashed before we run the `Cancel` method. In that case instead of doing an infinite loop in the Task, let's just create a for loop that will eventually finish after some time (longer than the anticipated maximum time).
+
+What we will have, will be similar to this:
+
+```cs
 try
 {
-    // Try to acquire lease - if someone was faster, this method throws an exception
-    log.LogInformation($"Trying to lease {possibleGift.Name}");
-    leaseID = possibleGift.AcquireLease(leaseTime, null);
+    //once we have a leased gift, we can create a Task to renew the lease
+    CancellationTokenSource tokenSource = new CancellationTokenSource();
+    CancellationToken token = tokenSource.Token;
+    Task.Run(() =>
+    {
+        try
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(50));
+                token.ThrowIfCancellationRequested();
+                log.LogInformation("Renewing lease");
+                leasedGift.RenewLease(acc);
+            }
+        }
+        catch(OperationCanceledException)
+        {
+            log.LogInformation("Lease renewal canceled");
+        }
+    }, token);
 
-    // If acquiring a lease was successful, do the following
-    log.LogInformation($"Leasing successful {possibleGift.Name}");
-    // AccessCondition is needed for operating on a leased blob
-    acc = new AccessCondition();
-    acc.LeaseId = leaseID;
-    // The current gift was leased, don't check any more possible gifts
-    leasedGift = possibleGift;
-    break;
+    //do operations on the leased blob
+
 }
-catch(Exception)
+finally
 {
-    log.LogInformation($"The gift {possibleGift.Name} was already leased, trying next");
+    tokenSource.Cancel();
 }
+
+
 ```
