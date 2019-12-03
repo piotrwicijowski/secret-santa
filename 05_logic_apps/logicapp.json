@@ -102,7 +102,7 @@
                     "method": "post",
                     "path": "/posttweet",
                     "queries": {
-                        "tweetText": "#AvanadeSecretSanta Look what I got for christmas: @{outputs('Compose')}"
+                        "tweetText": "#GCCSecretSanta Look what I got for christmas: @{outputs('Compose')}"
                     }
                 },
                 "runAfter": {
@@ -138,7 +138,7 @@
                 "inputs": {
                     "body": {
                         "Body": "@concat('<img src=''data:image/png;base64, ', body('Get_blob_content')?['$content'], '''/>')",
-                        "Subject": "#AvanadeSecretSanta Look what I got for christmas:@{outputs('Compose')}  + @{body('Create_SAS_URI_by_path')?['WebUrl']}",
+                        "Subject": "#GCCSecretSanta Look what I got for christmas:@{outputs('Compose')}  + @{body('Create_SAS_URI_by_path')?['WebUrl']}",
                         "To": "your-email@acme.com"
                     },
                     "host": {
