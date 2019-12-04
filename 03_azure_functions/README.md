@@ -197,9 +197,11 @@ Add new function to get the uploaded image and post it Azure Storage.
 2. Choose function app created before.
 
 3. Create a new Function within the Function App
+
 ![](screenshots/Create-Function2.PNG?raw=true "Create function")
 
 4. Choose the **“HTTP Trigger”** for the Template
+
 ![](screenshots/Create-Function3.PNG?raw=true "Create function")
 
 5. Choose new name for the Function and select “Anonymous” for Authorization Level
