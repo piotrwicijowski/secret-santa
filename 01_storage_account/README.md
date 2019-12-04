@@ -43,7 +43,7 @@ After you save changes, an Azure Storage container has been created automaticall
 
 ![](screenshots/containerweb8.PNG?raw=true "Containers")
 
-## 5. Upload files (for e.g. index.html, 404.html, style.css, bg.jpg)
+## 5. Upload files (index.html, 404.html, style.css, bg.jpg, extra.png)
 
 ![](screenshots/uploadfiles9.PNG?raw=true "Upload files")
 
