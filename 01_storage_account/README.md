@@ -56,3 +56,11 @@ After you save changes, an Azure Storage container has been created automaticall
 ## ... and if it’s not:
 
 ![](screenshots/workingforme.jpg?raw=true "It's wroking fine for me")
+
+# Extras
+
+Add ability to upload an image and send it to the function
+
+### Steps
+
+follow the steps above to create and upload the files from `extras` subfolder
