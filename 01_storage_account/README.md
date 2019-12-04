@@ -1,5 +1,3 @@
-[Deploy Storage Account to Azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpiotrwicijowski%2Fsecret-santa%2Fmaster%2F01_storage_account%2Ftemplate.json)
-
 # Static website hosting in Azure Storage - Step by step
 
 ## 1. Create storage account
