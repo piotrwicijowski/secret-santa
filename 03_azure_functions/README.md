@@ -192,6 +192,7 @@ Add new function to get the uploaded image and post it Azure Storage.
 ## Create new function in the existing Function app
 
 1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**
+
 ![](screenshots/Create-Function1.PNG?raw=true "Create function")
 
 2. Choose function app created before.
@@ -205,6 +206,7 @@ Add new function to get the uploaded image and post it Azure Storage.
 ![](screenshots/Create-Function3.PNG?raw=true "Create function")
 
 5. Choose new name for the Function and select “Anonymous” for Authorization Level
+
 ![](screenshots/Create-Function4.PNG?raw=true "Create function")
 
 6. Modify function.json to enable Blob Output. Add in bidinngs section:
@@ -260,7 +262,6 @@ It is also not much complicated... we need to make sure that blob container actu
 await blobContainer.CreateIfNotExistsAsync();
 var cloudBlockBlob = blobContainer.GetBlockBlobReference(blobName);
 await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
-
 ```
 
 ### Return response
@@ -289,5 +290,4 @@ using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
 ```
