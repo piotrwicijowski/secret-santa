@@ -94,3 +94,66 @@
 ![](screenshots/slack-result.png?raw=true)
 
 * You may modify the `Slack` action parameters to format the message better (e.g. enable `Post As User`)
+
+# Logic App Extras
+
+## Introduction
+
+Use Cognitive Services to find the most related tags and post it as a hashtags in Logic App.
+
+## Get Cognitive services url and key
+
+Go to your Resource group and click on already created Cognitive Services. 
+
+Then get url from **Overview** -> **Endpoint**.
+
+![](screenshots/get-url.png?raw=true)
+
+To get a key go to **Keys** and copy **Key 1**.
+
+![](screenshots/get-key.png?raw=true)
+
+## Add Computer Vision Tag block in existing Logic App
+
+We will start with adding new block in the Logic App. New step should be added before the step to publish gift to the social media.
+
+Choose **Computer Vision API** action and select **Tag Image**:
+
+![](screenshots/select-tag-image.png?raw=true)
+
+Add information about your Cognitive Services:
+
+![](screenshots/add-computer-vision.png?raw=true)
+
+After filling the Cognitive Servies, select **Image Content** in **Image Source**
+
+![](screenshots/select-image-content.png?raw=true)
+
+then select **File Content** from dynamic content:
+
+![](screenshots/file-content.png?raw=true)
+
+
+After all of that we need to add two steps to our Logic App:
+- Initialize variable
+- For each control action (to interate through returned tags)
+
+Add **Initialize variable** from Variables  as one below:
+
+![](screenshots/initialize-variable.png?raw=true)
+
+Add **For each** from Control connector:
+
+![](screenshots/for-each.png?raw=true)
+
+To select the collection through which we will iterate, in **Output** control select tags:
+
+![](screenshots/select-tags.png?raw=true)
+
+Now, it is a time to select an action for each 'for-each'. Choose **Append to string variable** action from Variables connector. Choose variable which you have initialize before:
+
+![](screenshots/append-to-string.png?raw=true)
+
+In the Value put Expression: `concat('#', item()?['name'])` 
+
+Then connect this value in slack message you will send. 
