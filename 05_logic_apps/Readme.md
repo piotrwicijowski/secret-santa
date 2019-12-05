@@ -101,6 +101,8 @@
 
 Use Cognitive Services to find the most related tags and post it as a hashtags in Logic App.
 
+All steps for our extra part, we will do before sending image to the Slack.
+
 ## Get Cognitive services url and key
 
 Go to your Resource group and click on already created Cognitive Services. 
@@ -125,14 +127,15 @@ Add information about your Cognitive Services:
 
 ![](screenshots/add-computer-vision.png?raw=true)
 
-After filling the Cognitive Servies, select **Image Content** in **Image Source**
+After filling the Cognitive Servies, select **Image Url** in **Image Source**. Also in **Add new parameter** input, select **Image URL**:
 
-![](screenshots/select-image-content.png?raw=true)
+![](screenshots/select-image-url.png?raw=true)
 
-then select **File Content** from dynamic content:
+then select **Web-url** from dynamic content:
 
-![](screenshots/file-content.png?raw=true)
+![](screenshots/image-url-web-url.png?raw=true)
 
+## Add tags to the string variable
 
 After all of that we need to add two steps to our Logic App:
 - Initialize variable
@@ -142,7 +145,7 @@ Add **Initialize variable** from Variables  as one below:
 
 ![](screenshots/initialize-variable.png?raw=true)
 
-Add **For each** from Control connector:
+After this step, add new step called **For each** from Control connector:
 
 ![](screenshots/for-each.png?raw=true)
 
@@ -150,10 +153,18 @@ To select the collection through which we will iterate, in **Output** control se
 
 ![](screenshots/select-tags.png?raw=true)
 
-Now, it is a time to select an action for each 'for-each'. Choose **Append to string variable** action from Variables connector. Choose variable which you have initialize before:
+Now, it is a time to select an action for each 'for-each'. Choose **Append to string variable** action from Variables connector. 
 
-![](screenshots/append-to-string.png?raw=true)
+![](screenshots/append-to-string-variable.png?raw=true)
+
+Then choose variable which you have initialize before:
 
 In the Value put Expression: `concat('#', item()?['name'])` 
 
-Then connect this value in slack message you will send. 
+![](screenshots/append-to-string-variable-2.png?raw=true)
+
+## Connect variable with "Post message" step
+
+Then connect this value in slack message you will send. In the **Message Text** the reference to your variable:
+
+![](screenshots/post-message-with-hashtags.png?raw=true)
