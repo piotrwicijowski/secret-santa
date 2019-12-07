@@ -147,10 +147,92 @@ const string stockingStorageConnectionString = "you'll paste your own connection
 
 </details>
 
+## Connecting to storage accounts
 
 <details>
 <summary>
-## Connecting to storage accounts
+    Click to expand/collapse
 </summary>
+
+Now, since we have the connection strings, we can connect to the storage accounts (steps 1. and 2.). For this we use `Parse` method of `CloudStorageAccount`, `CreateCloudBlobClient` for each account and `GetContainerReference` of each blob client. In the end, what we get for steps 1. and 2. is the following (plug this code into your scaffolding):
+
+```cs
+    // 1. and 2. - Setup connection to both blob storages
+    // Storage accounts for your storage
+    var xmasTreeStorageAccount = CloudStorageAccount.Parse(xmastreeStorageConnectionString);
+    var stockingStorageAccount = CloudStorageAccount.Parse(stockingStorageConnectionString);
+    // CloudBlobClient instances for working with blobs
+    var xmasTreeCloudBlobClient = xmasTreeStorageAccount.CreateCloudBlobClient();
+    var stockingCloudBlobClient = stockingStorageAccount.CreateCloudBlobClient();
+    // Reference xmastree and stocking containers
+    var xmasTreeCloudBlobContainer = xmasTreeCloudBlobClient.GetContainerReference("xmastree");
+    var stockingCloudBlobContainer = stockingCloudBlobClient.GetContainerReference("stocking");
+```
+
+</details>
+
+## List all the gifts 
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+Now that we have objects representing the blob containers, we can do operations on them. First of all we need to get all of the available gifts in the xmastree container. We generally use `ListBlobs` method, but in addition we need to do some small operations so that the blobs are usable to us - we need to cast the returned objects to specific type and we need to have results in a list. In the end, what we get for step 3. is the following (plug this code into your scaffolding):
+
+```cs
+    // 3. List the blobs in the container.
+    var giftList = xmasTreeCloudBlobContainer.ListBlobs().Select(x => x as CloudBlockBlob).ToList();
+```
+
+</details>
+
+## Get a random gift
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+Now that we have a list of all available gifts, we choose one at random. For this we will use built-in .Net class `Random`, and its method `Next` that returns a random number in range `[0..Count]`. In the end, what we get for step 4. is the following (plug this code into your scaffolding):
+
+```cs
+    // 4. Pick random gift
+    // Get a random index in the range [0..Count-1] and get a gift from the list with that index
+    var rnd = new Random();
+    int randomIndex = rnd.Next(giftList.Count);
+    var randomGift = giftList[randomIndex];
+```
+
+</details>
+
+## Move the gift into your storage
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+Finally, we need to move that blob to our container. To move a blob, we first need to copy it - for that we will use `MemoryStream` - we will download the blob to that stream first, and then upload the stream into target blob. Finally, once the blob is copied, we can delete the original blob from under the xmas tree. In the end, what we get for step 5. is the following (plug this code into your scaffolding):
+
+```cs
+    // 5. "Move" the gift to the stocking
+    // The blob for gift in our stocking container
+    var stockingGift = stockingCloudBlobContainer.GetBlockBlobReference(randomGift.Name);
+    // Copy the gift to our stocking
+    // We will copy the blob through memory stream
+    using(var memoryStream = new MemoryStream())
+    {
+        // Download to memory first
+        randomGift.DownloadToStream(memoryStream);
+        // Reset the stream to upload from the start
+        memoryStream.Seek(0, SeekOrigin.Begin);
+        // Upload the stream
+        stockingGift.UploadFromStream(memoryStream);
+    }
+
+    // Once the copying was finished, delete the gift
+    randomGift.DeleteIfExists();
+```
 
 </details>
