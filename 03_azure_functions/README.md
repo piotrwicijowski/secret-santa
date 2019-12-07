@@ -24,7 +24,7 @@ Set a unique name for the function app, i.e. "search-for-a-gift". Choose **.NET 
 
 ![](screenshots/rg1.PNG?raw=true "Function added")
 
-You can see that other resources have also been created. Go to the newly created app service. Now you can see a little bit different view. Click on a blue plus sign next to **Functions**.
+You can see that other resources have also been created. Go to the newly created app service. Now you can see a little bit different view. Click on the blue plus sign next to **Functions**.
 
 ![](screenshots/fun1.PNG?raw=true "Function preview")
 
@@ -40,12 +40,12 @@ Click **Create**. Your first function is ready to start! You can click **Run** t
 
 ## Cognitive Service
 
-We need to create "Cognitive Services" to use Bing Search API to find images with gifts. To do so, add a new resource of type. "Cognitive Services". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function resource.
+We need to create "Cognitive Services" to use Bing Search API to find images with gifts. To do so, add a new resource of type: "Cognitive Services". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function resource.
 
 ![](screenshots/cog1.PNG?raw=true "Cognitive Service")
 
-Set a unique name, select a location, you choose **S0** pricing tier this is enough for our needs.
-The resource should be created quickly. When it is ready, you should see its key and endpoint.
+Set a unique name, select a location (West Europe), you choose **S0** pricing tier this is enough for our needs.
+The resource should be created quickly. When it is ready, you can go to the resource and you should see its key and endpoint.
 
 ![](screenshots/cog2.PNG?raw=true "Cognitive Service")
 
@@ -53,7 +53,7 @@ You will need them for upcoming development phase. :)
 
 ## Development Time!
 
-Now the journey begins! In the code, create an empty asynchronous function, let’s call it "ProcessSearch".
+Now the journey begins! In the code of your Azure Function, create an empty asynchronous function, let’s call it "ProcessSearch".
 
 ```cs
 private static async Task<string> ProcessSearch(string searchTerm, ILogger log)
@@ -156,11 +156,11 @@ Now paste the connection string to your app setting input field. Click **OK**. Y
 
 ![](screenshots/Binding4.PNG?raw=true "Binding")
 
-Remember to click Save. Good job! Now, go back to your Function App and click Integrate.
+Remember to click **Save**. Good job! Now, go back to your Function App and click Integrate.
 
 ![](screenshots/Binding5.PNG?raw=true "Binding")
 
-Add new output binding:
+Add new output binding, then choose **Azure Blob Storage**:
 
 ![](screenshots/Binding6.PNG?raw=true "Binding")
 
@@ -168,11 +168,11 @@ Install necessary extension.
 
 ![](screenshots/Binding61.PNG?raw=true "Binding")
 
-Click **Azure Blob Storage** and then click **Select**.
+Choose the created connection and click **Save**.
 
 ![](screenshots/Binding7.PNG?raw=true "Binding")
 
-Choose the created connection and click **Save**. You should see the binding like in the following picture:
+ You should see the binding like in the following picture:
 
 ![](screenshots/Binding8.PNG?raw=true "Binding")
 
@@ -201,7 +201,12 @@ Fantastic! Now, go back to the ProcessSearch function. You have everything you n
 
 Awesome! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
 Copy the URL from the page where your code is, click *</> Get Function URL* link.
+
+![](screenshots/Url1.PNG?raw=true "Function URL")
+
 Paste the URL to the index.html page.
+
+![](screenshots/Url1.PNG?raw=true "Function URL")
  
 OMG! I totally forgot! You have to enable CORS! You can read abour CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 Azure Function and Azure Storage are in different domain. We have to let the website talk to the function.
