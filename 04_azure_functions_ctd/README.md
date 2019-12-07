@@ -2,7 +2,7 @@
 
 If you are reading this not during workshops, but rather in your own time and prefer more detailed instructions that will give you a deeper understanding, head over to the [detailed version](Detailed/README.md).
 
-## Introduction
+## :new_moon: Introduction
 
 <details>
 <summary>
@@ -13,7 +13,7 @@ In this module we will create another Azure Function, which will randomly select
 
 </details>
 
-## Azure resources setup
+## :new_moon: Azure resources setup
 
 <details>
 <summary>
@@ -32,7 +32,7 @@ Secondly, we need to make an Azure Function, and this time, instead of HttpTrigg
 
 </details>
 
-## Set up Nuget packages
+## :new_moon: Set up Nuget packages
 
 <details>
 <summary>
@@ -61,7 +61,7 @@ Inside the `function.proj` file paste in the following:
 
 </details>
 
-## Scaffolding
+## :waxing_crescent_moon: Scaffolding
 
 <details>
 <summary>
@@ -233,6 +233,85 @@ Finally, we need to move that blob to our container. To move a blob, we first ne
 
     // Once the copying was finished, delete the gift
     randomGift.DeleteIfExists();
+```
+
+</details>
+
+## Time to test!
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+With all these pieces in place we are ready to run the function. Even though the function is set up to run on schedule, we can also run it with "Run" button at the top of the function's editing area.
+
+When you run the function successfully, you can check the result by going to your storage account, opening the Storage Explorer, expanding the Blob Containers and looking into the stocking container:
+
+![Gift in stocking container](screenshots/storage_first_gift.png?raw=true "Gift in stocking container")
+
+
+</details>
+
+## Conflict resolution
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+For now everything was nice and orderly - since during tests everyone ran their function at different moments, there were no fights for presents, no access conflicts. But as you may imagine, if this was ran at schedule and every function was executed in the same second, some gifts may be copied by many people, some gifts may be broken (if a gift was deleted while another one was in the process of copying it). Let's fix this.
+
+Fortunately, Azure Blobs give us a nice mechanism for claiming a blob - [blob leasing](https://docs.microsoft.com/en-us/rest/api/storageservices/lease-blob). If one client leases a blob, all other clients trying to lease will throw an exception.
+
+With that in mind, let's think for a second, how to re-think the code. Of course we need to get some gift, so if our leasing fails, we can't crash, but rather we need to keep trying until we get some gift. And if we are very unlucky, we will have to try many gifts, so we need to loop over them. And once we are successful with leasing a gift, we should not check and lease other remaining gifts.
+
+So, in the end, we need to replace the logic for our section 4. that is used to pick random gifts. Inside, we will randomize the list of gifts, iterate over all of them, try leasing the gifts one by one, and once we succeed, we can move further. Replace the part 4. of your function with the following snippet:
+
+```cs
+    // 4. Pick random gift
+    // Randomize the order in which we will try picking up the presents
+    var rnd = new Random();
+    var randomizedGifts = giftList.OrderBy(g => rnd.Next()).ToList();
+    // Blob leasing - making sure only one client at a time can access a specific blob
+    // Variable that will eventually hold a gift that we managed to get a lease on
+    CloudBlockBlob randomGift = null;
+    string leaseID = null;
+    AccessCondition acc = null;
+    // Maximum finite time for lease is 60 seconds
+    TimeSpan leaseTime = TimeSpan.FromSeconds(60);
+    // Check each gift one by one and try to lease it - if someone was faster, move to another one
+    foreach(var possibleGift in randomizedGifts)
+    {
+        try
+        {
+            // Try to acquire lease - if someone was faster, this method throws an exception
+            leaseID = possibleGift.AcquireLease(leaseTime, null);
+            // If acquiring a lease was successful, do the following
+            log.LogInformation($"Leasing successful {possibleGift.Name}");
+            // AccessCondition is needed for operating on a leased blob
+            acc = new AccessCondition();
+            acc.LeaseId = leaseID;
+            // The current gift was leased, don't check any more possible gifts
+            randomGift = possibleGift;
+            break;
+        }
+        catch(Exception)
+        {
+            log.LogInformation($"The gift {possibleGift.Name} was already leased, trying next");
+        }
+    }
+    // If we tried to lease all gifts and none of it was available, return
+    if(randomGift == null){
+        log.LogError($"All gifts were already leased, exiting");
+        return;
+    }
+```
+
+And one more thing - once the blob is leased, then in order to delete it we need to prove that we are the ones who leased it. Replace the last `DeleteIfExists` statement in your function with the following line:
+
+```cs
+    randomGift.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots, acc, null, null);
 ```
 
 </details>
