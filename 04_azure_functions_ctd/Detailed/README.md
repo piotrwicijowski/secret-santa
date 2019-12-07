@@ -43,7 +43,7 @@ We will start with the simplest approach, and we will refine it later on. In sum
 
 1. Connect to the "common blob container" - let's call it the Xmas tree
 2. Connect to the "private blob container" - this one we will call the stocking
-3. List all of the blobs/gifts in it
+3. List all of the blobs/gifts in xmastree
 4. Choose a random gift from the list
 5. "Move" it to the stocking
 

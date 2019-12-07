@@ -6,7 +6,7 @@ If you are reading this not during workshops, but rather in your own time and pr
 
 <details>
 <summary>
-    Click to expand
+    Click to expand/collapse
 </summary>
 
 In this module we will create another Azure Function, which will randomly select one of the gifts in the common storage - we will call this the "xmas tree" and that gift will be moved to our own storage - we will call it the "stocking"
@@ -17,7 +17,7 @@ In this module we will create another Azure Function, which will randomly select
 
 <details>
 <summary>
-    Click to expand
+    Click to expand/collapse
 </summary>
 
 First, we need to make sure that we have a place where we can put out gifts - a blob storage container called "stocking". For this, in Azure Portal navigate to your Storage Account, under Blob Service click Containers, add a new Container and name it "stocking":
@@ -36,7 +36,7 @@ Secondly, we need to make an Azure Function, and this time, instead of HttpTrigg
 
 <details>
 <summary>
-    Click to expand
+    Click to expand/collapse
 </summary>
 
 Azure Functions allow you to use external libraries from public Nuget repository - thats around 180 thousand packages that can help you solve your problems. In order to use them, we need to add a `function.proj` file to our newly created function's folder. To do so, follow these steps:
@@ -61,20 +61,58 @@ Inside the `function.proj` file paste in the following:
 
 </details>
 
-## First version
+## Scaffolding
 
 <details>
 <summary>
-    Click to expand
+    Click to expand/collapse
 </summary>
 
 Before we start coding, we need to come up with a rough plan on what our function needs to do. When we put down the information textually it will go something like this:
 
-1. Connect to the "common blob container" - let's call it the Xmas tree
+1. Connect to the "common blob container" - let's call it the xmastree
 2. Connect to the "private blob container" - this one we will call the stocking
-3. List all of the blobs/gifts in it
+3. List all of the blobs/gifts in xmastree
 4. Choose a random gift from the list
 5. "Move" it to the stocking
+
+We have created a scaffolding code below for this function with marked places where each piece of code should go. This code would not work yet, but we will work on this. Copy the snippet below to the `run.csx` file in your function:
+
+```cs
+using System;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+
+// Connection strings for both Storage Accounts:
+// The xmastree is the "common storage" of gifts
+const string xmastreeStorageConnectionString = "you'll get this during the workshops";
+// The stocking is your personal storage for your gift
+const string stockingStorageConnectionString = "you'll paste your own connection string here";
+
+public static void Run(TimerInfo myTimer, ILogger log)
+{
+    // 1. and 2. - Setup connection to both blob storages
+    // Storage accounts for your storage
+    var xmasTreeStorageAccount = ...
+    var stockingStorageAccount = ...
+    // CloudBlobClient instances for working with blobs
+    var xmasTreeCloudBlobClient = ...
+    var stockingCloudBlobClient = ...
+    // Reference xmastree and stocking containers
+    var xmasTreeCloudBlobContainer = ...
+    var stockingCloudBlobContainer = ...
+
+    // 3. List the blobs in the container.
+    var giftList = xmasTreeCloudBlobContainer....
+    // 4. Pick random gift
+    var randomGift = giftList....
+
+    // 5. "Move" the gift to the stocking
+    var ourGift = stockingCloudBlobContainer...
+    ourGift....Upload/Copy/Move....randomGift....
+
+}
+```
 
 </details>
 
