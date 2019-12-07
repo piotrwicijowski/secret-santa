@@ -146,6 +146,7 @@ Now, simply click **New application setting**.
 
 The new dialog will appear. Set the name i.e. "STORAGE_BINDING" and paste the connection string to your local storage. At the final stage we will replace the local storage connection string with the shared one that will imitiate a christmas tree.
 To get the connection string to the storage, I advise to open a new tab with Azure Portal. Go to your resource group and click the Storage account resource type.
+
 ![](screenshots/rg1.PNG?raw=true "Function added")
 
 Then click **Access Keys** on the left. You should see a *key1*, *ConnectionString* etc., just like in the picture below. Copy the *ConnectionString*.
@@ -168,7 +169,7 @@ Install necessary extension.
 
 ![](screenshots/Binding61.PNG?raw=true "Binding")
 
-Choose the created connection and click **Save**.
+Once it has been installed, choose the created connection and click **Save**.
 
 ![](screenshots/Binding7.PNG?raw=true "Binding")
 
@@ -176,15 +177,15 @@ Choose the created connection and click **Save**.
 
 ![](screenshots/Binding8.PNG?raw=true "Binding")
 
-If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change only two things releted to the blob binding.
+If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change only two things related to the *blob* binding section.
 First, the path from **outcontainer/{rand-guid}** to **christmastree/{rand-guid}** and the direction from **out** to **inout**. Save changes.
 Well the binding is ready, let’s put the last chunks of code.
 
 ## Let's finish it!
 
-Add the parameter to the **Run** function: “CloudBlockBlob outputBlob”. Add that parameter to **ProcessSearch** function too.
+Add the parameter to the **Run** function: “CloudBlockBlob outputBlob”. Add that parameter to the **ProcessSearch** function too.
 
-Fantastic! Now, go back to the ProcessSearch function. You have everything you need to fill in gaps in the code. Deserializing part you can copy from the following snippet:
+Fantastic! Now, go back to the ProcessSearch function. You have everything you need to fill in gaps in the code. You can copy all from the following snippet:
 
 ```cs
    // 1. Call the Bing API.
@@ -199,22 +200,46 @@ Fantastic! Now, go back to the ProcessSearch function. You have everything you n
    return contentUrl;
 ```
 
+Call the ProcessSearch function within the Run function.
+
+```cs
+var contentUrl = await ProcessSearch(name, log, outputBlob);
+```
+
 Awesome! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
-Copy the URL from the page where your code is, click *</> Get Function URL* link.
+Copy the URL from the page where your function code is, click *</> Get Function URL* link.
 
 ![](screenshots/Url1.PNG?raw=true "Function URL")
 
-Paste the URL to the index.html page.
+Paste the URL to the index.html page and upload it to the storage.
 
 ![](screenshots/Url1.PNG?raw=true "Function URL")
  
 OMG! I totally forgot! You have to enable CORS! You can read abour CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
-Azure Function and Azure Storage are in different domain. We have to let the website talk to the function.
+Azure Function and Azure Storage are in different domains. We have to let the website talk to the function.
 You should see the link to CORS setting like in the picture below.
 
 ![](screenshots/cors.PNG?raw=true "CORS")
 
 After clicking **CORS**, paste the URL of your website there. **Save** changes.
+
+## Testing
+
+All in all, you can test if everything works. Think of unusual gift and send it. :)
+
+![](screenshots/test1.PNG?raw=true "Testing")
+
+In the storage you should see the **christmastree** container.
+
+![](screenshots/test2.PNG?raw=true "Testing")
+
+And a Blob inside it. Click the Blob name.
+
+![](screenshots/test3.PNG?raw=true "Testing")
+
+Click **Generate SAS** tab and then click **Generate SAS token and URL**. Copy Blob SAS URL and preview the gift in the browser. :)
+
+![](screenshots/test4.PNG?raw=true "Testing")
 
 # Function's Extras
 
