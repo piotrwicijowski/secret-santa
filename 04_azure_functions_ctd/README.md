@@ -9,7 +9,7 @@ If you are reading this not during workshops, but rather in your own time and pr
     Click to expand/collapse
 </summary>
 
-In this module we will create another Azure Function, which will randomly select one of the gifts in the common storage - we will call this the "xmas tree" and that gift will be moved to our own storage - we will call it the "stocking"
+In this module we will create another Azure Function, which will randomly select one of the gifts in the common storage - we will call this the "xmas tree" and that gift will be moved to our own storage - we will call it the "stocking".
 
 </details>
 
@@ -76,7 +76,7 @@ Before we start coding, we need to come up with a rough plan on what our functio
 4. Choose a random gift from the list
 5. "Move" it to the stocking
 
-We have created a scaffolding code below for this function with marked places where each piece of code should go. This code would not work yet, but we will work on this. Copy the snippet below to the `run.csx` file in your function:
+We have created a scaffolding code below for this function with marked places where each piece of code should go. This code does not work yet, but we will fix that in a minute. Copy the snippet below to the `run.csx` file in your function:
 
 ```cs
 using System;
@@ -261,7 +261,7 @@ You should now have a working basic version of the function. If at this point yo
     Click to expand/collapse
 </summary>
 
-For now everything was nice and orderly - since during tests everyone ran their function at different moments, there were no fights for presents, no access conflicts. But as you may imagine, if this was ran at schedule and every function was executed in the same second, some gifts may be copied by many people, some gifts may be broken (if a gift was deleted while another one was in the process of copying it). Let's fix this.
+For now everything was nice and orderly - since during tests everyone ran their function at different moments, there were no fights for gifts, no access conflicts. But as you may imagine, if this was ran at schedule and every function was executed in the same second, some gifts may be copied by many people, some gifts may be broken (if a gift was deleted while another one was in the process of copying it). Let's fix this.
 
 Fortunately, Azure Blobs give us a nice mechanism for claiming a blob - [blob leasing](https://docs.microsoft.com/en-us/rest/api/storageservices/lease-blob). If one client leases a blob, all other clients trying to lease will throw an exception.
 
@@ -328,6 +328,13 @@ And one more thing - once the blob is leased, then in order to delete it we need
 
 ## :full_moon: That's it
 
-You should now have a working, robust function that will work despite conflicts. If at this point you had some issues along the way, or the function does not compile, you can use [this checkpoint of the code](Secret.Santa.Functions/ChooseRandomGift_2/run.csx) - just make sure to replace the connection strings at the beginning.
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+You should now have a working, robust function that will be resistant to conflicts and will peacefully co-exist with others. If at this point you had some issues along the way, or the function does not compile, you can use [this checkpoint of the code](Secret.Santa.Functions/ChooseRandomGift_2/run.csx) - just make sure to replace the connection strings at the beginning.
 
 And if you are hungry for even more details, explanations and in-depth info, feel free to check out the [detailed version](Detailed/README.md) of this Readme
+
+</details>
