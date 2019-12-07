@@ -78,15 +78,6 @@ Before we start coding, we need to come up with a rough plan on what our functio
 
 We have created a scaffolding code below for this function with marked places where each piece of code should go. This code would not work yet, but we will work on this. Copy the snippet below to the `run.csx` file in your function:
 
-<div style="position: relative;">
-<div style="position: absolute;height: 100%;width: 5px;padding: 16px 0;font-size: 1.22em;">
-  <div style="position: absolute;top: 5em;background-color: #B71C1C;height: 5em;width: 100%;"></div>
-  <div style="position: absolute;top: 13em;background-color: #1565C0;height: 10em;width: 100%;"></div>
-  <div style="position: absolute;top: 24em;background-color: #1B5E20;height: 2em;width: 100%;"></div>
-  <div style="position: absolute;top: 26em;background-color: #F57F17;height: 2em;width: 100%;"></div>
-  <div style="position: absolute;top: 29em;background-color: #311B92;height: 3em;width: 100%;"></div>
-</div>
-
 ```cs
 using System;
 using Microsoft.Azure.Storage;
@@ -123,8 +114,6 @@ public static void Run(TimerInfo myTimer, ILogger log)
 }
 ```
 
-</div>
-
 </details>
 
 ## Connection strings
@@ -133,5 +122,27 @@ public static void Run(TimerInfo myTimer, ILogger log)
 <summary>
     Click to expand/collapse
 </summary>
+
+The first part of the function body scaffolding contains a reference to connection strings. We need two of those - the connection string for xmastree will be shared with you during the workshops. Paste that connection string in the quotes in following place in the scaffolding:
+
+```cs
+// The xmastree is the "common storage" of gifts
+const string xmastreeStorageConnectionString = "you'll get this during the workshops";
+```
+
+When it comes to the connection string for your own storage account, then you need to extract it yourself by following these steps:
+
+- Go to your Storage Account
+- Click on the Settings -> Access keys option
+- You will see key1 and key2 sections, and under both there is a Connection string entry. You can choose either of these. On the very right of the string there is a copy button.
+
+![Storage account connection string](screenshots/storage_connectionstring.png?raw=true "Storage account connection string")
+
+Paste that connection string in the quotes in the following place in the scaffolding:
+
+```cs
+// The stocking is your personal storage for your gift
+const string stockingStorageConnectionString = "you'll paste your own connection string here";
+```
 
 </details>
