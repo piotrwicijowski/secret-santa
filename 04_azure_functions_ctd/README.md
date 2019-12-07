@@ -78,6 +78,15 @@ Before we start coding, we need to come up with a rough plan on what our functio
 
 We have created a scaffolding code below for this function with marked places where each piece of code should go. This code would not work yet, but we will work on this. Copy the snippet below to the `run.csx` file in your function:
 
+<div style="position: relative;">
+<div style="position: absolute;height: 100%;width: 5px;padding: 16px 0;font-size: 1.22em;">
+  <div style="position: absolute;top: 5em;background-color: #B71C1C;height: 5em;width: 100%;"></div>
+  <div style="position: absolute;top: 13em;background-color: #1565C0;height: 10em;width: 100%;"></div>
+  <div style="position: absolute;top: 24em;background-color: #1B5E20;height: 2em;width: 100%;"></div>
+  <div style="position: absolute;top: 26em;background-color: #F57F17;height: 2em;width: 100%;"></div>
+  <div style="position: absolute;top: 29em;background-color: #311B92;height: 3em;width: 100%;"></div>
+</div>
+
 ```cs
 using System;
 using Microsoft.Azure.Storage;
@@ -114,5 +123,15 @@ public static void Run(TimerInfo myTimer, ILogger log)
 }
 ```
 
+</div>
+
 </details>
 
+## Connection strings
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+</details>
