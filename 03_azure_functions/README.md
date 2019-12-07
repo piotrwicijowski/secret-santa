@@ -1,4 +1,4 @@
-# Azure Functions
+Ôªø# Azure Functions
 
 ## Introduction
 In the previous module we have created a static website.
@@ -53,7 +53,7 @@ You will need them for upcoming development phase. :)
 
 ## Development Time!
 
-Now the journey begins! In the code of your Azure Function, create an empty asynchronous function, letís call it "ProcessSearch".
+Now the journey begins! In the code of your Azure Function, create an empty asynchronous function, let‚Äôs call it "ProcessSearch".
 
 ```cs
 private static async Task<string> ProcessSearch(string searchTerm, ILogger log)
@@ -179,11 +179,11 @@ Once it has been installed, choose the created connection and click **Save**.
 
 If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change only two things related to the *blob* binding section.
 First, the path from **outcontainer/{rand-guid}** to **christmastree/{rand-guid}** and the direction from **out** to **inout**. Save changes.
-Well the binding is ready, letís put the last chunks of code.
+Well the binding is ready, let‚Äôs put the last chunks of code.
 
 ## Let's finish it!
 
-Add the parameter to the **Run** function: ìCloudBlockBlob outputBlobî. Add that parameter to the **ProcessSearch** function too.
+Add the parameter to the **Run** function: ‚ÄúCloudBlockBlob outputBlob‚Äù. Add that parameter to the **ProcessSearch** function too.
 
 Fantastic! Now, go back to the ProcessSearch function. You have everything you need to fill in gaps in the code. You can copy all from the following snippet:
 
@@ -206,7 +206,29 @@ Call the ProcessSearch function within the Run function.
 var contentUrl = await ProcessSearch(name, log, outputBlob);
 ```
 
-Awesome! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
+Awesome! I am glad you achieved the goal. :)
+
+## Rename the function and update Static Website
+
+"HttpTrigger1" is a default name, when can rename it to something more meaningful.
+So, go **App Service Editor**
+
+![](screenshots/rename1.PNG?raw=true "Rename")
+
+Right click on "HttpTrigger1" then click "Rename".
+
+![](screenshots/rename2.PNG?raw=true "Rename")
+
+Rename it to **BlaBlaBla** and hit Enter. Now restart the Azure Function.
+You can find the restart button in the function overview tab.
+
+![](screenshots/rename3.PNG?raw=true "Rename")
+
+Good, now refresh the view.
+
+![](screenshots/rename4.PNG?raw=true "Refresh")
+
+Voil√†! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
 Copy the URL from the page where your function code is, click *</> Get Function URL* link.
 
 ![](screenshots/Url1.PNG?raw=true "Function URL")
@@ -259,7 +281,7 @@ Add a new function to get the uploaded image and post it to Azure Storage.
 
 ![](screenshots/Create-Function2.PNG?raw=true "Create function")
 
-4. Choose the **ìHTTP Triggerî** for the Template.
+4. Choose the **‚ÄúHTTP Trigger‚Äù** for the Template.
 
 ![](screenshots/Create-Function3.PNG?raw=true "Create function")
 
