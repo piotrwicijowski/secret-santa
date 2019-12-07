@@ -116,7 +116,7 @@ public static void Run(TimerInfo myTimer, ILogger log)
 
 </details>
 
-## Connection strings
+## :waxing_crescent_moon: Connection strings
 
 <details>
 <summary>
@@ -147,7 +147,7 @@ const string stockingStorageConnectionString = "you'll paste your own connection
 
 </details>
 
-## Connecting to storage accounts
+## :first_quarter_moon: Connecting to storage accounts
 
 <details>
 <summary>
@@ -171,7 +171,7 @@ Now, since we have the connection strings, we can connect to the storage account
 
 </details>
 
-## List all the gifts 
+## :first_quarter_moon: List all the gifts 
 
 <details>
 <summary>
@@ -187,7 +187,7 @@ Now that we have objects representing the blob containers, we can do operations 
 
 </details>
 
-## Get a random gift
+## :first_quarter_moon: Get a random gift
 
 <details>
 <summary>
@@ -206,7 +206,7 @@ Now that we have a list of all available gifts, we choose one at random. For thi
 
 </details>
 
-## Move the gift into your storage
+## :first_quarter_moon: Move the gift into your storage
 
 <details>
 <summary>
@@ -237,7 +237,7 @@ Finally, we need to move that blob to our container. To move a blob, we first ne
 
 </details>
 
-## Time to test!
+## :first_quarter_moon: Time to test!
 
 <details>
 <summary>
@@ -250,10 +250,11 @@ When you run the function successfully, you can check the result by going to you
 
 ![Gift in stocking container](screenshots/storage_first_gift.png?raw=true "Gift in stocking container")
 
+You should now have a working basic version of the function. If at this point you had some issues along the way, or the function does not compile, you can use [this checkpoint of the code](Secret.Santa.Functions/ChooseRandomGift_1/run.csx) - just make sure to replace the connection strings at the beginning.
 
 </details>
 
-## Conflict resolution
+## :waxing_gibbous_moon: Conflict resolution
 
 <details>
 <summary>
@@ -266,7 +267,16 @@ Fortunately, Azure Blobs give us a nice mechanism for claiming a blob - [blob le
 
 With that in mind, let's think for a second, how to re-think the code. Of course we need to get some gift, so if our leasing fails, we can't crash, but rather we need to keep trying until we get some gift. And if we are very unlucky, we will have to try many gifts, so we need to loop over them. And once we are successful with leasing a gift, we should not check and lease other remaining gifts.
 
-So, in the end, we need to replace the logic for our section 4. that is used to pick random gifts. Inside, we will randomize the list of gifts, iterate over all of them, try leasing the gifts one by one, and once we succeed, we can move further. Replace the part 4. of your function with the following snippet:
+</details>
+
+## :waxing_gibbous_moon: Leasing
+
+<details>
+<summary>
+    Click to expand/collapse
+</summary>
+
+So, with all that information about leasing, we need to replace the logic for our section 4. that is used to pick random gifts. Inside, we will randomize the list of gifts, iterate over all of them, try leasing the gifts one by one, and once we succeed, we can move further. Replace the part 4. of your function with the following snippet:
 
 ```cs
     // 4. Pick random gift
@@ -315,3 +325,9 @@ And one more thing - once the blob is leased, then in order to delete it we need
 ```
 
 </details>
+
+## :full_moon: That's it
+
+You should now have a working, robust function that will work despite conflicts. If at this point you had some issues along the way, or the function does not compile, you can use [this checkpoint of the code](Secret.Santa.Functions/ChooseRandomGift_2/run.csx) - just make sure to replace the connection strings at the beginning.
+
+And if you are hungry for even more details, explanations and in-depth info, feel free to check out the [detailed version](Detailed/README.md) of this Readme
