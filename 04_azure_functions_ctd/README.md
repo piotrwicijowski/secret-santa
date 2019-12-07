@@ -146,3 +146,11 @@ const string stockingStorageConnectionString = "you'll paste your own connection
 ```
 
 </details>
+
+
+<details>
+<summary>
+## Connecting to storage accounts
+</summary>
+
+</details>
