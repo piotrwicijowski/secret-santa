@@ -40,11 +40,11 @@ Click **Create**. Your first function is ready to start! You can click **Run** t
 
 ## Cognitive Service
 
-We need to create Cognitive Service to use Bing search API to find images with gifts. To do so, add a new resource of type. "Cognitive Service". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function.
+We need to create "Cognitive Services" to use Bing Search API to find images with gifts. To do so, add a new resource of type. "Cognitive Services". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function resource.
 
 ![](screenshots/cog1.PNG?raw=true "Cognitive Service")
 
-Set a unique name, choose S0 pricing tier this is enough for our needs.
+Set a unique name, select a location, you choose **S0** pricing tier this is enough for our needs.
 The resource should be created quickly. When it is ready, you should see its key and endpoint.
 
 ![](screenshots/cog2.PNG?raw=true "Cognitive Service")
@@ -53,22 +53,22 @@ You will need them for upcoming development phase. :)
 
 ## Development Time!
 
-Now the journey begins! In the code, create an empty asynchronous function, let’s call it ProcessSearch.
+Now the journey begins! In the code, create an empty asynchronous function, let’s call it "ProcessSearch".
 
 ```cs
 private static async Task<string> ProcessSearch(string searchTerm, ILogger log)
 {
-   // Call the Bing API.
+   // 1. Call the Bing API.
  
-   // Deserialize the JSON response from the Bing Image Search API.
+   // 2. Deserialize the JSON response from the Bing Image Search API.
  
-   //Save an image to the Azure Storage.
+   // 3. Save an image to the Azure Storage.
  
    return string.Empty;
 }
 ```
 
-Now copy the following code that searches for an image. Set subscription key and urlBase.
+Now copy the following code that searches for an image. Set subscription key and urlBase. You should copy them from Cognitive Services keys. Yes, these which you have already seen.
 
 ```cs
 private static async Task<string> BingImageSearch(string searchTerm)
@@ -87,21 +87,32 @@ private static async Task<string> BingImageSearch(string searchTerm)
 }
 ```
 
-Now copy the following code and _fill in missing conditions_ for png, gif and bmp file types.Follow the pattern as it is for jpeg file type.
+Now copy the following code. When we save Blob to Azure Storage we have to specify its content type. The file extension is not enought for the storage.
 
 ```cs
-private static string GetConentType(string fileName)
+public static string GetConentType(string fileName)
 {
-   string name = fileName.ToLower();
-   string contentType = "image/jpeg";
-  
-   // Conditions go here.
-  
-   return contentType;
+    string name = fileName.ToLower();
+    string contentType = "image/jpeg";
+    
+    if (name.EndsWith("png"))
+    {
+        contentType = "image/png";
+    }
+    else if (name.EndsWith("gif"))
+    {
+        contentType = "image/gif";
+    }
+    else if (name.EndsWith("bmp"))
+    {
+        contentType = "image/bmp";
+    }
+    
+    return contentType;
 }
 ```
 
-Now copy the following code that storage the image in the blob storage. Put valid credentials provided by host.
+Now copy the following code that stores the image in the blob storage.
 
 ```cs
 private static async Task SaveToStorage(string contentUrl, CloudBlockBlob outputBlob)
@@ -118,14 +129,14 @@ private static async Task SaveToStorage(string contentUrl, CloudBlockBlob output
 }
 ```
 
-Does it compile? No! CloudBlockBlob is unknown class type. We need to add a NuGet Package and include necessary libraries. Add the new NuGet Package called: "Microsoft.WindowsAzure.Storage" at the top of the script. Use the following libraries:
-“Microsoft.WindowsAzure.Storage”, “Microsoft.WindowsAzure.Storage.Blob”
+Does it compile? No! CloudBlockBlob is an unknown class type. We need to add one NuGet Package and include two necessary libraries. Add the new NuGet Package called: "*Microsoft.WindowsAzure.Storage*" at the top of the script. Use the following libraries:
+"*Microsoft.WindowsAzure.Storage*", "*Microsoft.WindowsAzure.Storage.Blob*".
  
-Check if everything compiles. Should be!
+Check if everything compiles. Should be!!!
 
 ## Data Binding
 
-We need to create a binding! Instead of adding connection string in the code we can make it easier. First, create application setting. Go to **Configuration**.
+We need to create a binding! Instead of adding connection string in the code we can make it easier. First, create an application setting. Go to **Configuration**.
 
 ![](screenshots/Binding1.PNG?raw=true "Binding")
 
@@ -134,10 +145,14 @@ Now, simply click **New application setting**.
 ![](screenshots/Binding2.PNG?raw=true "Binding")
 
 The new dialog will appear. Set the name i.e. "STORAGE_BINDING" and paste the connection string to your local storage. At the final stage we will replace the local storage connection string with the shared one that will imitiate a christmas tree.
+To get the connection string to the storage, I advise to open a new tab with Azure Portal. Go to your resource group and click the Storage account resource type.
+![](screenshots/rg1.PNG?raw=true "Function added")
 
-![](screenshots/Binding3.PNG?raw=true "Binding")
+Then click **Access Keys** on the left. You should see a *key1*, *ConnectionString* etc., just like in the picture below. Copy the *ConnectionString*.
 
-Click **OK**. You should see the new setting in the list.
+![](screenshots/Binding3.PNG?raw=true "Connection String To Storage")
+
+Now paste the connection string to your app setting input field. Click **OK**. You should see the new setting in the list.
 
 ![](screenshots/Binding4.PNG?raw=true "Binding")
 
@@ -161,7 +176,9 @@ Choose the created connection and click **Save**. You should see the binding lik
 
 ![](screenshots/Binding8.PNG?raw=true "Binding")
 
-If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change the direction from **out** to **inout** and save changes. Well the binding is ready, let’s put the last chunks of code.
+If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change only two things releted to the blob binding.
+First, the path from **outcontainer/{rand-guid}** to **christmastree/{rand-guid}** and the direction from **out** to **inout**. Save changes.
+Well the binding is ready, let’s put the last chunks of code.
 
 ## Let's finish it!
 
@@ -170,14 +187,25 @@ Add the parameter to the **Run** function: “CloudBlockBlob outputBlob”. Add that
 Fantastic! Now, go back to the ProcessSearch function. You have everything you need to fill in gaps in the code. Deserializing part you can copy from the following snippet:
 
 ```cs
-dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(result);
-var firstJsonObj = jsonObj["value"][0];
-string contentUrl = firstJsonObj["contentUrl"];
+   // 1. Call the Bing API.
+   var result = await BingImageSearch(searchTerm);
+   // 2. Deserialize the JSON response from the Bing Image Search API.
+   dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(result);
+   var firstJsonObj = jsonObj["value"][0];
+   string contentUrl = firstJsonObj["contentUrl"];
+   // 3. Save an image to the Azure Storage.
+   await SaveToStorage(contentUrl, outputBlob);
+
+   return contentUrl;
 ```
 
-Awesome! You can add the function to the HTML page you have already created and be happy as it all works like a charm.
+Awesome! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
+Copy the URL from the page where your code is, click *</> Get Function URL* link.
+Paste the URL to the index.html page.
  
-Before, you copy the URL to post action in your Static Website, you have to enable CORS!
+OMG! I totally forgot! You have to enable CORS! You can read abour CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
+Azure Function and Azure Storage are in different domain. We have to let the website talk to the function.
+You should see the link to CORS setting like in the picture below.
 
 ![](screenshots/cors.PNG?raw=true "CORS")
 
@@ -187,25 +215,25 @@ After clicking **CORS**, paste the URL of your website there. **Save** changes.
 
 ## Introduction
 
-Add new function to get the uploaded image and post it Azure Storage.
+Add a new function to get the uploaded image and post it to Azure Storage.
 
 ## Create new function in the existing Function app
 
-1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**
+1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**.
 
 ![](screenshots/Create-Function1.PNG?raw=true "Create function")
 
 2. Choose function app created before.
 
-3. Create a new Function within the Function App
+3. Create a new Function within the Function App.
 
 ![](screenshots/Create-Function2.PNG?raw=true "Create function")
 
-4. Choose the **“HTTP Trigger”** for the Template
+4. Choose the **“HTTP Trigger”** for the Template.
 
 ![](screenshots/Create-Function3.PNG?raw=true "Create function")
 
-5. Choose new name for the Function and select “Anonymous” for Authorization Level
+5. Choose new name for the Function and select "Anonymous" for Authorization Level.
 
 ![](screenshots/Create-Function4.PNG?raw=true "Create function")
 
@@ -222,7 +250,7 @@ Add new function to get the uploaded image and post it Azure Storage.
 
 ## Now, let's do actual development
 
-Our function's skeleton looks like this
+Our function's skeleton looks like this:
 ```
 //Imports and using
 
