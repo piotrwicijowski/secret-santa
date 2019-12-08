@@ -78,9 +78,10 @@
             var resultDiv = document.getElementById('result');
             /* Clear result div*/
             resultDiv.innerText = '';
-
+            
+            var urlToAzureFunction = '';
             /* Send the data using post and put the results in a div. */
-            fetch("url to azure function",
+            fetch(urlToAzureFunction,
             {
                 headers: {
                   'Accept': 'application/json',
