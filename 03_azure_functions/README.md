@@ -20,7 +20,7 @@ Click **Create**.
 
 ![](screenshots/Add-Function3.PNG?raw=true "Add a Function")
 
-Set a unique name for the function app, i.e. "search-for-a-gift". Choose **.NET Core** as running stack. Click **Review + create** and then click **Create**. You need to wait some time until the resource is created.
+Set a unique name for the function app, i.e. "SecretSantaFunctionApp" with your initials at the end. Choose **.NET Core** as running stack. Click **Review + create** and then click **Create**. You need to wait some time until the resource is created.
 
 ![](screenshots/rg1.PNG?raw=true "Function added")
 
@@ -178,7 +178,7 @@ Once it has been installed, choose the created connection and click **Save**.
 ![](screenshots/Binding8.PNG?raw=true "Binding")
 
 If you click the link to **Advanced editor**, you should JSON configuration of bindings. Yes, go there and change only two things related to the *blob* binding section.
-First, the path from **outcontainer/{rand-guid}** to **christmastree/{rand-guid}** and the direction from **out** to **inout**. Save changes.
+First, the path from **outcontainer/\{rand-guid\}** to **christmastree/\{rand-guid\}** and the direction from **out** to **inout**. Save changes.
 Well the binding is ready, let’s put the last chunks of code.
 
 ## Let's finish it!
@@ -210,7 +210,7 @@ Awesome! I am glad you achieved the goal. :)
 
 ## Rename the function and update Static Website
 
-"HttpTrigger1" is a default name, when can rename it to something more meaningful.
+"HttpTrigger1" is a default name, we can rename it to something more meaningful.
 So, go **App Service Editor**
 
 ![](screenshots/rename1.PNG?raw=true "Rename")
@@ -219,23 +219,29 @@ Right click on "HttpTrigger1" then click "Rename".
 
 ![](screenshots/rename2.PNG?raw=true "Rename")
 
-Rename it to **BlaBlaBla** and hit Enter. Now restart the Azure Function.
+Rename it to **GiveAGift** and hit Enter. Now, restart the Azure Function.
 You can find the restart button in the function overview tab.
 
 ![](screenshots/rename3.PNG?raw=true "Rename")
 
-Good, now refresh the view.
+Good, now refresh the view. You may need to restart again and again. Restarting takes some time under the hood.
 
 ![](screenshots/rename4.PNG?raw=true "Refresh")
 
-Voilà! You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
+Voilà!
+
+![](screenshots/rename5.PNG?raw=true "Refresh")
+
+You can add the function URL to the HTML page you have already created and be happy as it all works like a charm.
 Copy the URL from the page where your function code is, click *</> Get Function URL* link.
 
 ![](screenshots/Url1.PNG?raw=true "Function URL")
 
 Paste the URL to the index.html page and upload it to the storage.
 
-![](screenshots/Url1.PNG?raw=true "Function URL")
+```cs
+var urlToAzureFunction = 'https://search-for-a-gift.azurewebsites.net/api/GiveAGift?code=xyzabcverylongcode==';
+```
  
 OMG! I totally forgot! You have to enable CORS! You can read abour CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
 Azure Function and Azure Storage are in different domains. We have to let the website talk to the function.
