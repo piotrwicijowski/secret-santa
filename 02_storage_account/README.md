@@ -11,8 +11,6 @@ Click to expand!
 
 ![](screenshots/p_a_sorage_accounts2.PNG?raw=true "Add new storage account")
 
-</details>
-
 ### Hints:
 
 <details>
@@ -34,6 +32,8 @@ After successful validation press “Create” button.
 ![](screenshots/did-i-hear-someone-say-deployment.jpg?raw=true "Funny cat")
 
 When your deployment is complete go to your new storage account.
+
+</details>
 
 </details>
 

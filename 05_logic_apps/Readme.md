@@ -208,7 +208,7 @@ Last part is to appennd hastags to Choose **Append to string variable** action f
 
 ![](screenshots/append-to-string-variable.png?raw=true)
 
-Then choose variable which you have initialize before. In the **Value** put Expression: `concat('#', item()?['name'])` 
+Then choose variable which you have initialize before. In the **Value** put Expression: `concat('#', body('Join'))` 
 
 ![](screenshots/append-to-string-variable-2.png?raw=true)
 
