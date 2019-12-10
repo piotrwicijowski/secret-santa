@@ -59,8 +59,12 @@ After you save changes, an Azure Storage container has been created automaticall
 
 # Extras
 
-Add ability to upload an image and send it to the function
+<details>
+  <summary>Click to expand!</summary>
+	Add ability to upload an image and send it to the function
 
-### Steps
+	## Steps
 
-follow the steps above to create and upload the files from `extras` subfolder
+	Follow the steps above to create and upload the files from `extras` subfolder
+
+</details>
