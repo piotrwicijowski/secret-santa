@@ -280,6 +280,10 @@ Click to expand!
 Add a new function to get the uploaded image and post it to Azure Storage.
 
 ## Create new function in the existing Function app
+<details>
+<summary>
+Click to expand!
+</summary>
 
 1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**.
 
@@ -309,8 +313,13 @@ Add a new function to get the uploaded image and post it to Azure Storage.
 	"direction": "out"
 }
 ```
+</details>
 
 ## Now, let's do actual development
+<details>
+<summary>
+Click to expand!
+</summary>
 
 Our function's skeleton looks like this:
 ```
@@ -381,5 +390,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Net.Http;
 using System.Net.Http.Headers;
 ```
+
+</details>
 
 </details>
