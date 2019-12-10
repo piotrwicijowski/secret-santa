@@ -270,110 +270,113 @@ Click **Generate SAS** tab and then click **Generate SAS token and URL**. Copy B
 ![](screenshots/test4.PNG?raw=true "Testing")
 
 # Function's Extras
+<details>
+  <summary>Click to expand!</summary>
 
-## Introduction
+	## Introduction
 
-Add a new function to get the uploaded image and post it to Azure Storage.
+	Add a new function to get the uploaded image and post it to Azure Storage.
 
-## Create new function in the existing Function app
+	## Create new function in the existing Function app
 
-1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**.
+	1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**.
 
-![](screenshots/Create-Function1.PNG?raw=true "Create function")
+	![](screenshots/Create-Function1.PNG?raw=true "Create function")
 
-2. Choose function app created before.
+	2. Choose function app created before.
 
-3. Create a new Function within the Function App.
+	3. Create a new Function within the Function App.
 
-![](screenshots/Create-Function2.PNG?raw=true "Create function")
+	![](screenshots/Create-Function2.PNG?raw=true "Create function")
 
-4. Choose the **“HTTP Trigger”** for the Template.
+	4. Choose the **“HTTP Trigger”** for the Template.
 
-![](screenshots/Create-Function3.PNG?raw=true "Create function")
+	![](screenshots/Create-Function3.PNG?raw=true "Create function")
 
-5. Choose new name for the Function and select "Anonymous" for Authorization Level.
+	5. Choose new name for the Function and select "Anonymous" for Authorization Level.
 
-![](screenshots/Create-Function4.PNG?raw=true "Create function")
+	![](screenshots/Create-Function4.PNG?raw=true "Create function")
 
-6. Modify function.json to enable Blob Output. Add in bidinngs section:
-```
-{
-	"name": "blobContainer",
-	"type": "blob",
-	"path": "yourContainerName",
-	"connection": "yourConnectionToStorageName",
-	"direction": "out"
-}
-```
+	6. Modify function.json to enable Blob Output. Add in bidinngs section:
+	```
+	{
+		"name": "blobContainer",
+		"type": "blob",
+		"path": "yourContainerName",
+		"connection": "yourConnectionToStorageName",
+		"direction": "out"
+	}
+	```
 
-## Now, let's do actual development
+	## Now, let's do actual development
 
-Our function's skeleton looks like this:
-```
-//Imports and using
+	Our function's skeleton looks like this:
+	```
+	//Imports and using
 
-public static async Task<IActionResult> Run(HttpRequest req, CloudBlobContainer blobContainer, ILogger log)
-{
-    //Get file from HttpRequest
+	public static async Task<IActionResult> Run(HttpRequest req, CloudBlobContainer blobContainer, ILogger log)
+	{
+		//Get file from HttpRequest
 
-    //Save file in public blob
+		//Save file in public blob
 
-    //Return OK message
-}
+		//Return OK message
+	}
 
-```
+	```
 
-Let's walk through it together:
+	Let's walk through it together:
 
-At first place, you can see all imports and usings which will be used in our code... but let's do this at the end ;)
+	At first place, you can see all imports and usings which will be used in our code... but let's do this at the end ;)
 
-Then there is a Function's method signature. Our Function will be asynchronous, accepts 3 arguments:
-- http request which will contain image
-- blob container to which we will upload the file
-- logger
+	Then there is a Function's method signature. Our Function will be asynchronous, accepts 3 arguments:
+	- http request which will contain image
+	- blob container to which we will upload the file
+	- logger
 
-As a first step we will get file from the request, then save it and return information for the requestor that all went well.
+	As a first step we will get file from the request, then save it and return information for the requestor that all went well.
 
-### Get file from HTTP Request
+	### Get file from HTTP Request
 
-It's pretty simple:
-```
-var file = req.Form.Files[0];
-```
+	It's pretty simple:
+	```
+	var file = req.Form.Files[0];
+	```
 
-### Save file in blob container
+	### Save file in blob container
 
-It is also not much complicated... we need to make sure that blob container actually exists and create a blob block for our image. Then upload the image from the stream... and all is done!
-```
-await blobContainer.CreateIfNotExistsAsync();
-var cloudBlockBlob = blobContainer.GetBlockBlobReference(blobName);
-await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
-```
+	It is also not much complicated... we need to make sure that blob container actually exists and create a blob block for our image. Then upload the image from the stream... and all is done!
+	```
+	await blobContainer.CreateIfNotExistsAsync();
+	var cloudBlockBlob = blobContainer.GetBlockBlobReference(blobName);
+	await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
+	```
 
-### Return response
+	### Return response
 
-```
-return new OkObjectResult(blobName);
-```
+	```
+	return new OkObjectResult(blobName);
+	```
 
-### Imports and usings
+	### Imports and usings
 
-Last but not least:
-```
-#r "Newtonsoft.Json"
-#r "Microsoft.WindowsAzure.Storage"
-#r "System.Net.Http"
-#r "Microsoft.Azure.WebJobs"
+	Last but not least:
+	```
+	#r "Newtonsoft.Json"
+	#r "Microsoft.WindowsAzure.Storage"
+	#r "System.Net.Http"
+	#r "Microsoft.Azure.WebJobs"
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System.Net.Http;
-using System.Net.Http.Headers;
-```
+	using System;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.Azure.WebJobs;
+	using Microsoft.AspNetCore.Http;
+	using Microsoft.Extensions.Logging;
+	using Newtonsoft.Json;
+	using Microsoft.WindowsAzure.Storage.Blob;
+	using System.Net.Http;
+	using System.Net.Http.Headers;
+	```
+</details>
