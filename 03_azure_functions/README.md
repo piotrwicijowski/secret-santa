@@ -300,10 +300,10 @@ Copy the URL from the page where your function code is, click *</> Get Function 
 
 ![](screenshots/Url1.PNG?raw=true "Function URL")
 
-Paste the URL to the index.html page and upload it to the storage.
+Paste the URL to the index.html page and upload the file to the storage. You can see the example below, you should paste your very own URL.
 
 ```cs
-var urlToAzureFunction = 'https://search-for-a-gift.azurewebsites.net/api/GiveAGift?code=xyzabcverylongcode==';
+const urlToAzureFunction = 'https://search-for-a-gift.azurewebsites.net/api/GiveAGift?code=xyzabcverylongcode==';
 ```
  
 OMG! I totally forgot! You have to enable CORS! You can read abour CORS [here](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
