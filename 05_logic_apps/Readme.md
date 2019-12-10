@@ -1,6 +1,12 @@
 # Logic apps
 
 ## Create blob trigger
+
+<details>
+<summary>
+Click to expand!
+</summary>
+
  * Open Azure portal (https://portal.azure.com)
  * Create a new LogicApp
  
@@ -62,7 +68,14 @@
 
   ![](screenshots/slack-config.png?raw=true)
 
+ </details>
+  
 ## Debugging a Logic App
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 * Click on `Save` and `Run`
 
@@ -94,6 +107,8 @@
 ![](screenshots/slack-result.png?raw=true)
 
 * You may modify the `Slack` action parameters to format the message better (e.g. enable `Post As User`)
+
+</details>
 
 # Logic App Extras
 
@@ -163,27 +178,37 @@ Click to expand!
 
 After all of that we need to add two steps to our Logic App:
 - Initialize variable
-- For each control action (to interate through returned tags)
+- Select names from tag list
+- Join names with # to create hashtags
+- Append hashtags to variable created before
 
 Add **Initialize variable** from Variables  as one below:
 
 ![](screenshots/initialize-variable.png?raw=true)
 
-After this step, add new step called **For each** from Control connector:
+After this step, add new step called **Select** from Data Operations connector:
 
-![](screenshots/for-each.png?raw=true)
+![](screenshots/add-select.png?raw=true)
 
-To select the collection through which we will iterate, in **Output** control select tags:
+To select the collection fromt which we will select values, in **From** input select "tags", and in **Map** input choose "Tag Name"
 
 ![](screenshots/select-tags.png?raw=true)
 
-Now, it is a time to select an action for each 'for-each'. Choose **Append to string variable** action from Variables connector. 
+![](screenshots/select-tag-names.png?raw=true)
+
+Now, it is a time to join all names to create hashtags. Add new step and search for **Join** from Data Operations connector:
+
+![](screenshots/add-join.png?raw=true)
+
+In the **From** input choose Select Output and in **Join with** put ` #`:
+
+![](screenshots/join.png?raw=true)
+
+Last part is to appennd hastags to Choose **Append to string variable** action from Variables connector. 
 
 ![](screenshots/append-to-string-variable.png?raw=true)
 
-Then choose variable which you have initialize before:
-
-In the Value put Expression: `concat('#', item()?['name'])` 
+Then choose variable which you have initialize before. In the **Value** put Expression: `concat('#', item()?['name'])` 
 
 ![](screenshots/append-to-string-variable-2.png?raw=true)
 

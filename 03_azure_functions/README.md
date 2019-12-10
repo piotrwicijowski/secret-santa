@@ -7,6 +7,7 @@
 Click to expand!
 </summary>
 
+
 In the previous module we have created a static website.
 Now, we will be working on Functions that are triggered with HTTP requests.
 
@@ -19,6 +20,7 @@ Now, we will be working on Functions that are triggered with HTTP requests.
 Click to expand!
 </summary>
 
+
 In your own resource group you should have an Azure Storage Account - that is where (among other uses) the static website files from the first module are located.
 
 </details>
@@ -29,6 +31,7 @@ In your own resource group you should have an Azure Storage Account - that is wh
 <summary>
 Click to expand!
 </summary>
+
 
 ![](screenshots/Add-Function.PNG?raw=true "Add a Function")
 
@@ -67,6 +70,7 @@ Click **Create**. Your first function is ready to start! You can click **Run** t
 Click to expand!
 </summary>
 
+
 We need to create "Cognitive Services" to use Bing Search API to find images with gifts. To do so, add a new resource of type: "Cognitive Services". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function resource.
 
 ![](screenshots/cog1.PNG?raw=true "Cognitive Service")
@@ -86,6 +90,7 @@ You will need them for upcoming development phase. :)
 <summary>
 Click to expand!
 </summary>
+
 
 Now the journey begins! In the code of your Azure Function, create an empty asynchronous function, let’s call it "ProcessSearch".
 
@@ -177,6 +182,7 @@ Check if everything compiles. Should be!!!
 Click to expand!
 </summary>
 
+
 We need to create a binding! Instead of adding connection string in the code we can make it easier. First, create an application setting. Go to **Configuration**.
 
 ![](screenshots/Binding1.PNG?raw=true "Binding")
@@ -231,6 +237,7 @@ Well the binding is ready, let’s put the last chunks of code.
 Click to expand!
 </summary>
 
+
 Add the parameter to the **Run** function: “CloudBlockBlob outputBlob”. Add that parameter to the **ProcessSearch** function too.
 
 Fantastic! Now, go back to the ProcessSearch function. You have everything you need to fill in gaps in the code. You can copy all from the following snippet:
@@ -264,6 +271,7 @@ Awesome! I am glad you achieved the goal. :)
 <summary>
 Click to expand!
 </summary>
+
 
 "HttpTrigger1" is a default name, we can rename it to something more meaningful.
 So, go **App Service Editor**
@@ -315,6 +323,7 @@ After clicking **CORS**, paste the URL of your website there. **Save** changes.
 Click to expand!
 </summary>
 
+
 All in all, you can test if everything works. Think of unusual gift and send it. :)
 
 ![](screenshots/test1.PNG?raw=true "Testing")
@@ -348,6 +357,7 @@ Add a new function to get the uploaded image and post it to Azure Storage.
 <summary>
 Click to expand!
 </summary>
+
 
 1. Go to **Portal** then in Search input type **"Function"** and then select **Function App**.
 
@@ -384,6 +394,7 @@ Click to expand!
 <summary>
 Click to expand!
 </summary>
+
 
 Our function's skeleton looks like this:
 ```
