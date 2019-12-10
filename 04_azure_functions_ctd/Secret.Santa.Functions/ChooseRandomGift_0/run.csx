@@ -3,7 +3,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 
 // Connection strings for both Storage Accounts:
-// The xmastree is the "common storage" of gifts
+// The christmastree is the "common storage" of gifts
 const string xmastreeStorageConnectionString = "you'll get this during the workshops";
 // The stocking is your personal storage for your gift
 const string stockingStorageConnectionString = "you'll paste your own connection string here";
