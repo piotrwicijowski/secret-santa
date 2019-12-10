@@ -97,6 +97,11 @@
 
 # Logic App Extras
 
+<details>
+<summary>
+Click to expand!
+</summary>
+
 ## Introduction
 
 Use Cognitive Services to find the most related tags and post it as a hashtags in Logic App.
@@ -104,6 +109,11 @@ Use Cognitive Services to find the most related tags and post it as a hashtags i
 All steps for our extra part, we will do before sending image to the Slack.
 
 ## Get Cognitive services url and key
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 Go to your Resource group and click on already created Cognitive Services. 
 
@@ -115,7 +125,14 @@ To get a key go to **Keys** and copy **Key 1**.
 
 ![](screenshots/get-key.png?raw=true)
 
+</details>
+
 ## Add Computer Vision Tag block in existing Logic App
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 We will start with adding new block in the Logic App. New step should be added before the step to publish gift to the social media.
 
@@ -135,7 +152,14 @@ then select **Web-url** from dynamic content:
 
 ![](screenshots/image-url-web-url.png?raw=true)
 
+</details>
+
 ## Add tags to the string variable
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 After all of that we need to add two steps to our Logic App:
 - Initialize variable
@@ -163,8 +187,19 @@ In the Value put Expression: `concat('#', item()?['name'])`
 
 ![](screenshots/append-to-string-variable-2.png?raw=true)
 
+</details>
+
 ## Connect variable with "Post message" step
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 Then connect this value in slack message you will send. In the **Message Text** the reference to your variable:
 
 ![](screenshots/post-message-with-hashtags.png?raw=true)
+
+</details>
+
+</details>

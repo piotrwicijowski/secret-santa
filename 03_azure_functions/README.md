@@ -1,14 +1,34 @@
 ﻿# Azure Functions
 
 ## Introduction
+
+<details>
+<summary>
+Click to expand!
+</summary>
+
 In the previous module we have created a static website.
 Now, we will be working on Functions that are triggered with HTTP requests.
 
+</details>
+
 ## Baseline
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 In your own resource group you should have an Azure Storage Account - that is where (among other uses) the static website files from the first module are located.
 
+</details>
+
 ## Create First Function
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 ![](screenshots/Add-Function.PNG?raw=true "Add a Function")
 
@@ -38,7 +58,14 @@ Great! Now choose **Webhook + API**.
 
 Click **Create**. Your first function is ready to start! You can click **Run** to test it locally or **Get function URL** to use outside of Azure Portal.
 
+</details>
+
 ## Cognitive Service
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 We need to create "Cognitive Services" to use Bing Search API to find images with gifts. To do so, add a new resource of type: "Cognitive Services". If you are not sure how to add a resource, look at the beginning of this tutorial to see how you have created Azure Function resource.
 
@@ -51,7 +78,14 @@ The resource should be created quickly. When it is ready, you can go to the reso
 
 You will need them for upcoming development phase. :)
 
+</details>
+
 ## Development Time!
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 Now the journey begins! In the code of your Azure Function, create an empty asynchronous function, let’s call it "ProcessSearch".
 
@@ -134,7 +168,14 @@ Does it compile? No! CloudBlockBlob is an unknown class type. We need to add one
  
 Check if everything compiles. Should be!!!
 
+</details>
+
 ## Data Binding
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 We need to create a binding! Instead of adding connection string in the code we can make it easier. First, create an application setting. Go to **Configuration**.
 
@@ -181,7 +222,14 @@ If you click the link to **Advanced editor**, you should JSON configuration of b
 First, the path from **outcontainer/\{rand-guid\}** to **christmastree/\{rand-guid\}** and the direction from **out** to **inout**. Save changes.
 Well the binding is ready, let’s put the last chunks of code.
 
+</details>
+
 ## Let's finish it!
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 Add the parameter to the **Run** function: “CloudBlockBlob outputBlob”. Add that parameter to the **ProcessSearch** function too.
 
@@ -208,7 +256,14 @@ var contentUrl = await ProcessSearch(name, log, outputBlob);
 
 Awesome! I am glad you achieved the goal. :)
 
+</details>
+
 ## Rename the function and update Static Website
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 "HttpTrigger1" is a default name, we can rename it to something more meaningful.
 So, go **App Service Editor**
@@ -251,7 +306,14 @@ You should see the link to CORS setting like in the picture below.
 
 After clicking **CORS**, paste the URL of your website there. **Save** changes.
 
+</details>
+
 ## Testing
+
+<details>
+<summary>
+Click to expand!
+</summary>
 
 All in all, you can test if everything works. Think of unusual gift and send it. :)
 
@@ -268,6 +330,8 @@ And a Blob inside it. Click the Blob name.
 Click **Generate SAS** tab and then click **Generate SAS token and URL**. Copy Blob SAS URL and preview the gift in the browser. :)
 
 ![](screenshots/test4.PNG?raw=true "Testing")
+
+</details>
 
 # Function's Extras
 <details>
