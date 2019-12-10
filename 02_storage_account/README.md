@@ -60,7 +60,7 @@ After you save changes, an Azure Storage container has been created automaticall
 # Extras
 
 <details>
-  <summary>Click to expand!</summary>
+	<summary>Click to expand!</summary>
 	Add ability to upload an image and send it to the function
 
 	## Steps
