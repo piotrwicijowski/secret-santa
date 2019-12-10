@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 body {
-  background: url('bg.jpg') no-repeat center top;
+  background: url('images/bg.jpg') no-repeat center top;
   background-attachment: fixed;
   background-size: cover;
   font-family: 'Open Sans', sans-serif;
@@ -36,7 +36,7 @@ body {
 }
 .container .inner:after {
     content: '';
-    background: url(extra.png) no-repeat 0 0;
+    background: url(images/extra.png) no-repeat 0 0;
     background-size: cover;
     position: absolute;
     bottom: -110px;
@@ -130,7 +130,7 @@ body {
     width: 24px;
 }
 .input .message {
-    color: #F00;
+    color: rgb(68, 143, 68);
 }
 .button {
     display: flex;
@@ -154,6 +154,10 @@ body {
 }
 .button button:focus {
     outline: 0;
+}
+.button button:disabled {
+    background: gray;
+    cursor: not-allowed;
 }
 .snowflake {
     color: #fff;

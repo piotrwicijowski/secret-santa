@@ -69,24 +69,29 @@
             </div>
         </div>
     </div>
-    <script>
+        <script>
+
         var form = document.getElementById('postData');
         form.addEventListener('submit', function (event) {
             /* Stop form from submitting normally */
+            document.getElementById('submit').disabled = true;
             event.preventDefault();
-
+            setTimeout(function(){
+                document.getElementById('submit').disabled = false;
+            }, 3000);
+            
             var resultDiv = document.getElementById('result');
             /* Clear result div*/
             resultDiv.innerText = '';
-            
-            var urlToAzureFunction = '';
             /* Send the data using post and put the results in a div. */
+            const urlToAzureFunction = '';
             fetch(urlToAzureFunction,
             {
                 headers: {
                   'Accept': 'application/json',
                   'Content-Type': 'application/json'
                 },
+                mode: 'no-cors',
                 method: "POST",
                 body: JSON.stringify({"name" : document.getElementById('name').value})
             })
@@ -98,9 +103,10 @@
             .catch(function(res){
                 // Show error
                 resultDiv.innerText = 'There is error while submit';
+                resultDiv.style('color', '#f00');
             })
-
         });
+        
     </script>
 </body>
 
