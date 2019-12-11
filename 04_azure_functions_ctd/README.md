@@ -24,7 +24,7 @@ First, we need to make sure that we have a place where we can put out gifts - a 
 
 ![New blob container creation](screenshots/storage_new_container.png?raw=true "New blob container creation")
 
-Secondly, we need to make an Azure Function, and this time, instead of HttpTrigger, we will use a Timer Trigger. Open your Azure Function App and follow those steps:
+Secondly, we need to make an Azure Function, and this time, instead of HttpTrigger, we will use a Timer Trigger. Open your Azure Function App and create a new function called "DrawAGift" following these steps:
 
 ![New function creation](screenshots/functions_new_timer_01.png?raw=true "New function creation")
 ![Timer triggered function](screenshots/functions_new_timer_02.png?raw=true "Timer triggered function")
@@ -45,7 +45,7 @@ Azure Functions allow you to use external libraries from public Nuget repository
 ![Add new file](screenshots/functions_files_02.png?raw=true "Add new file")
 ![Name it function.proj](screenshots/functions_files_03.png?raw=true "Name it function.proj")
 
-Inside the `function.proj` file paste in the following:
+Inside the `function.proj` file paste the following:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -70,9 +70,9 @@ Inside the `function.proj` file paste in the following:
 
 Before we start coding, we need to come up with a rough plan on what our function needs to do. When we put down the information textually it will go something like this:
 
-1. Connect to the "common blob container" - let's call it the xmastree
+1. Connect to the "common blob container" - let's call it the christmastree
 2. Connect to the "private blob container" - this one we will call the stocking
-3. List all of the blobs/gifts in xmastree
+3. List all of the blobs/gifts in christmastree
 4. Choose a random gift from the list
 5. "Move" it to the stocking
 
@@ -84,7 +84,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 
 // Connection strings for both Storage Accounts:
-// The xmastree is the "common storage" of gifts
+// The christmastree is the "common storage" of gifts
 const string xmastreeStorageConnectionString = "you'll get this during the workshops";
 // The stocking is your personal storage for your gift
 const string stockingStorageConnectionString = "you'll paste your own connection string here";
@@ -123,10 +123,10 @@ public static void Run(TimerInfo myTimer, ILogger log)
     Click to expand/collapse
 </summary>
 
-The first part of the function body scaffolding contains a reference to connection strings. We need two of those - the connection string for xmastree will be shared with you during the workshops. Paste that connection string in the quotes in following place in the scaffolding:
+The first part of the function body scaffolding contains a reference to connection strings. We need two of those - the connection string for christmastree will be shared with you during the workshops. Paste that connection string in the quotes in following place in the scaffolding:
 
 ```cs
-// The xmastree is the "common storage" of gifts
+// The christmastree is the "common storage" of gifts
 const string xmastreeStorageConnectionString = "you'll get this during the workshops";
 ```
 
@@ -165,7 +165,7 @@ Now, since we have the connection strings, we can connect to the storage account
     var xmasTreeCloudBlobClient = xmasTreeStorageAccount.CreateCloudBlobClient();
     var stockingCloudBlobClient = stockingStorageAccount.CreateCloudBlobClient();
     // Reference xmastree and stocking containers
-    var xmasTreeCloudBlobContainer = xmasTreeCloudBlobClient.GetContainerReference("xmastree");
+    var xmasTreeCloudBlobContainer = xmasTreeCloudBlobClient.GetContainerReference("christmastree");
     var stockingCloudBlobContainer = stockingCloudBlobClient.GetContainerReference("stocking");
 ```
 
@@ -178,7 +178,7 @@ Now, since we have the connection strings, we can connect to the storage account
     Click to expand/collapse
 </summary>
 
-Now that we have objects representing the blob containers, we can do operations on them. First of all we need to get all of the available gifts in the xmastree container. We generally use `ListBlobs` method, but in addition we need to do some small operations so that the blobs are usable to us - we need to cast the returned objects to specific type and we need to have results in a list. In the end, what we get for step 3. is the following (plug this code into your scaffolding):
+Now that we have objects representing the blob containers, we can do operations on them. First of all we need to get all of the available gifts in the christmastree container. We generally use `ListBlobs` method, but in addition we need to do some small operations so that the blobs are usable to us - we need to cast the returned objects to specific type and we need to have results in a list. In the end, what we get for step 3. is the following (plug this code into your scaffolding):
 
 ```cs
     // 3. List the blobs in the container.
