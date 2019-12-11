@@ -176,21 +176,21 @@ then select **Web-url** from dynamic content:
 Click to expand!
 </summary>
 
-After all of that we need to add two steps to our Logic App:
+After all of that we need to add four steps to our Logic App:
 - Initialize variable
 - Select names from tag list
 - Join names with # to create hashtags
 - Append hashtags to variable created before
 
-Add **Initialize variable** from Variables  as one below:
+Add **Initialize variable** step from Variables connector as one below:
 
 ![](screenshots/initialize-variable.png?raw=true)
 
-After this step, add new step called **Select** from Data Operations connector:
+After adding first step, add new step called **Select** from Data Operations connector:
 
 ![](screenshots/add-select.png?raw=true)
 
-To select the collection fromt which we will select values, in **From** input select "tags", and in **Map** input choose "Tag Name"
+To select the collection from which we will select values, in **From** input select "tags", and in **Map** input choose "Tag Name"
 
 ![](screenshots/select-tags.png?raw=true)
 

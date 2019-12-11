@@ -89,7 +89,7 @@ Click to expand!
 
 </details>
 
-## 6.Go back to static website, copy primary endpoint, paste into browser and run
+## 6. Go back to static website, copy primary endpoint, paste into browser and run
 
 <details>
 <summary>
@@ -100,7 +100,7 @@ Click to expand!
 
 </details>
 
-## 7.Yay! It’s working!
+## 7. Yay! It’s working!
 
 <details>
 <summary>
