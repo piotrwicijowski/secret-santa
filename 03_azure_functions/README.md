@@ -433,6 +433,7 @@ var file = req.Form.Files[0];
 
 It is also not much complicated... we need to make sure that blob container actually exists and create a blob block for our image. Then upload the image from the stream... and all is done!
 ```
+var blobName = $"{file.FileName}";    
 await blobContainer.CreateIfNotExistsAsync();
 var cloudBlockBlob = blobContainer.GetBlockBlobReference(blobName);
 await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
