@@ -17,7 +17,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-public static async Task<IActionResult> Run(HttpRequest req, out CloudBlobContainer blobContainer, ILogger log)
+public static async Task<IActionResult> Run(HttpRequest req, CloudBlobContainer blobContainer, ILogger log)
 {
     //Get file from HttpRequest
     var file = req.Form.Files[0];

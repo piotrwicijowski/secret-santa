@@ -17,8 +17,8 @@
     {
       "name": "blobContainer",
       "type": "blob",
-      "path": "gifts",
-      "connection": "SecretSantaStorage",
+      "path": "christmastree",
+      "connection": "STORAGE_BINDING",
       "direction": "out"
     }
   ],
