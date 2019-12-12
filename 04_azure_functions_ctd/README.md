@@ -9,7 +9,7 @@ If you are reading this not during workshops, but rather in your own time and pr
     Click to expand/collapse
 </summary>
 
-In this module we will create another Azure Function, which will randomly select one of the gifts in the common storage - we will call this the "xmas tree" and that gift will be moved to our own storage - we will call it the "stocking".
+In this module we will create another Azure Function, which will randomly select one of the gifts in the common storage - we will call this the "christmastree" and that gift will be moved to our own storage - we will call it the "stocking".
 
 </details>
 
