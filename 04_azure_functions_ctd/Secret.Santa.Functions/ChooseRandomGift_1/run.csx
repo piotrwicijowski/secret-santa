@@ -42,6 +42,9 @@ public static void Run(TimerInfo myTimer, ILogger log)
         memoryStream.Seek(0, SeekOrigin.Begin);
         // Upload the stream
         stockingGift.UploadFromStream(memoryStream);
+        // Set the content type to the original one (presumably "image/jpeg" or similar)
+        stockingGift.Properties.ContentType = randomGift.Properties.ContentType;
+        stockingGift.SetProperties();
     }
 
     // Once the copying was finished, delete the gift
