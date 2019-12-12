@@ -194,7 +194,7 @@ Now that we have objects representing the blob containers, we can do operations 
     Click to expand/collapse
 </summary>
 
-Now that we have a list of all available gifts, we choose one at random. For this we will use built-in .Net class `Random`, and its method `Next` that returns a random number in range `[0..Count]`. In the end, what we get for step 4. is the following (plug this code into your scaffolding):
+Now that we have a list of all available gifts, we choose one at random. For this we will use built-in .Net class `Random`, and its method `Next` that returns a random number in range `[0..Count-1]`. In the end, what we get for step 4. is the following (plug this code into your scaffolding):
 
 ```cs
     // 4. Pick random gift
