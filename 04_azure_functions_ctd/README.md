@@ -338,6 +338,20 @@ And one more thing - once the blob is leased, then in order to delete it we need
 
 You should now have a working, robust function that will be resistant to conflicts and will peacefully co-exist with others. If at this point you had some issues along the way, or the function does not compile, you can use [this checkpoint of the code](Secret.Santa.Functions/ChooseRandomGift_2/run.csx) - just make sure to replace the connection strings at the beginning.
 
+If you want some extras and you are not afraid of more challenging tasks that will require some individual work, then carry on reading. Caution - there will be no screenshots or precise step-by-step instructions - if something does not work straight away, we recommend googling first.
+
+The goal of this exercise - setup a local environment for developing Azure Functions so that you will be able to write C# code on your machine instead of writing on web interface in Azure portal.
+
+1. We will be using a free editor/IDE called Visual Studio Code - find the installer in the web and run it on your machine.
+2. Once you have that, open Visual Studio Code and install an extension for Azure Functions.
+3. Clone this whole git repository to your local machine (if you downloaded it as a zip yesterday, this whole "extras" part was not added there yet, so re-download it again today)
+4. In Visual Studio Code, open the directory 04_azure_functions_ctd\Secret.Santa.Functions\ChooseRandomGift_extras\ from the cloned repo
+5. To avoid overwriting your working and existing function, go to Azure portal and create another Azure Function App instance for deploying this application.
+6. In Visual Studio Code right-click on the file browser pane and select option to "Deploy to Function App..."
+7. The dialogs will guide you through logging in to azure, selecting subscription, function app instance to deploy to etc.
+8. The code should now compile and deploy to Azure.
+9. This setup allows you to run the Azure Functions on your local machine - hit <F5> in Visual Studio Code to execute it locally.
+
 And if you are hungry for even more details, explanations and in-depth info, feel free to check out the [detailed version](Detailed/README.md) of this Readme
 
 </details>
